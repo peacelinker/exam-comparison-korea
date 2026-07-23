@@ -42,9 +42,8 @@ function confidence(profile: SheetProfile, threshold: number) {
 }
 
 function App() {
-  const [referenceDate, setReferenceDate] = useState(getSeoulToday);
-  const [latestExamDate, setLatestExamDate] = useState("");
-  const [thresholdPercent, setThresholdPercent] = useState(50);
+  const referenceDate = getSeoulToday();
+  const threshold = 0.5;
   const [parsed, setParsed] = useState<ParsedWorkbook | null>(null);
   const [currentSheet, setCurrentSheet] = useState("");
   const [previousSheet, setPreviousSheet] = useState("");
@@ -57,18 +56,12 @@ function App() {
   const [toast, setToast] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const threshold = thresholdPercent / 100;
   const recommendation = useMemo(
     () =>
       parsed
-        ? recommendSheets(
-            parsed.sheets,
-            referenceDate,
-            threshold,
-            latestExamDate || undefined,
-          )
+        ? recommendSheets(parsed.sheets, referenceDate, threshold)
         : null,
-    [parsed, referenceDate, threshold, latestExamDate],
+    [parsed, referenceDate],
   );
 
   useEffect(() => {
@@ -335,50 +328,6 @@ function App() {
             </div>
           )}
 
-          <div className="settings-grid">
-            <label>
-              <span>기준일 <em>Asia/Seoul</em></span>
-              <input
-                type="date"
-                value={referenceDate}
-                onChange={(event) => {
-                  setReferenceDate(event.target.value);
-                  setAnalysis(null);
-                }}
-              />
-              <small>날짜형 탭의 연도를 추론하는 기준입니다.</small>
-            </label>
-            <label>
-              <span>최근 시험일 <em>선택</em></span>
-              <input
-                type="date"
-                value={latestExamDate}
-                onChange={(event) => {
-                  setLatestExamDate(event.target.value);
-                  setAnalysis(null);
-                }}
-              />
-              <small>입력하면 월·일이 같은 탭을 먼저 살핍니다.</small>
-            </label>
-            <label>
-              <span>
-                I열 유효 입력률 기준 <strong>{thresholdPercent}%</strong>
-              </span>
-              <input
-                className="range"
-                type="range"
-                min="10"
-                max="100"
-                step="5"
-                value={thresholdPercent}
-                onChange={(event) => {
-                  setThresholdPercent(Number(event.target.value));
-                  setAnalysis(null);
-                }}
-              />
-              <small>자동 추천에만 적용되며 수동 선택이 우선합니다.</small>
-            </label>
-          </div>
         </section>
 
         {error && (
@@ -503,7 +452,7 @@ function App() {
 
               <div className="recommend-grid">
                 <article className="recommend-card current">
-                  <p>이번(최근) 시험 탭</p>
+                  <p>이번 시험 탭</p>
                   <strong>{recommendation.currentSheet ?? "직접 선택 필요"}</strong>
                   <span>{recommendation.currentReason}</span>
                 </article>
@@ -519,7 +468,7 @@ function App() {
 
               <div className="select-grid">
                 <label>
-                  <span>이번(최근) 시험 탭</span>
+                  <span>이번 시험 탭</span>
                   <select
                     value={currentSheet}
                     onChange={(event) => {
