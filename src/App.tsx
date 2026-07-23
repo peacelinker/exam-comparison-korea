@@ -22,8 +22,6 @@ import type {
   SheetProfile,
 } from "./types";
 
-type Stage = "upload" | "confirm" | "report";
-
 const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
 const countUnknown = (profile: SheetProfile) =>
   Object.values(profile.metrics.unknownStatusCounts).reduce(
@@ -67,7 +65,6 @@ function App() {
     manualSelection,
   ]);
 
-  const stage: Stage = analysis ? "report" : parsed ? "confirm" : "upload";
   const selectedRegionAnalysis = analysis?.regions.find(
     (region) => region.region === selectedRegion,
   );
@@ -205,80 +202,21 @@ function App() {
   return (
     <div className="app-shell">
       <header className="hero">
-        <nav className="topbar" aria-label="서비스 안내">
-          <div className="brand">
-            <span className="brand-mark" aria-hidden="true">
-              비
-            </span>
-            <span>시험 비교 분석</span>
-          </div>
-          <span className="local-badge">
-            <span className="status-dot" aria-hidden="true" />
-            브라우저 내부 처리
-          </span>
-        </nav>
-
-        <div className="hero-grid">
-          <div>
-            <p className="eyebrow">EXAM COMPARISON WORKSPACE</p>
-            <h1>
-              엑셀 두 탭의 변화를
-              <br />
-              정확하게 비교하세요
-            </h1>
-            <p className="hero-copy">
-              날짜형 탭과 I열 입력률을 함께 살펴 적절한 시험 탭을 추천하고,
-              지역별 증감과 명단을 정해진 양식으로 정리합니다.
-            </p>
-          </div>
-          <div className="privacy-card">
-            <div className="shield" aria-hidden="true">
-              <span>✓</span>
-            </div>
-            <div>
-              <strong>파일은 이 기기를 벗어나지 않습니다</strong>
-              <p>
-                서버 전송, 로그인, 저장, 분석 추적 없이 현재 브라우저
-                메모리에서만 처리합니다.
-              </p>
-            </div>
-          </div>
-        </div>
+        <h1>시험 비교 분석기</h1>
+        <p className="hero-copy">
+          엑셀 파일에서 이번 시험과 직전 시험 탭을 선택하면 지역별 증감과
+          명단을 비교해 보고서로 정리합니다.
+        </p>
+        <p className="privacy-line">
+          원본 엑셀은 수정하거나 저장하지 않으며, 선택한 파일은 현재
+          브라우저 메모리에서만 처리합니다.
+        </p>
       </header>
 
       <main>
-        <ol className="stepper" aria-label="분석 진행 단계">
-          {[
-            ["01", "파일과 기준 설정"],
-            ["02", "탭 추천 확인"],
-            ["03", "보고서 생성"],
-          ].map(([number, label], index) => {
-            const currentIndex =
-              stage === "upload" ? 0 : stage === "confirm" ? 1 : 2;
-            return (
-              <li
-                key={number}
-                className={
-                  index === currentIndex
-                    ? "active"
-                    : index < currentIndex
-                      ? "complete"
-                      : ""
-                }
-              >
-                <span>{index < currentIndex ? "✓" : number}</span>
-                <strong>{label}</strong>
-              </li>
-            );
-          })}
-        </ol>
-
         <section className="workspace-card" aria-labelledby="upload-title">
           <div className="section-heading">
-            <div>
-              <p className="section-kicker">STEP 01</p>
-              <h2 id="upload-title">파일과 분석 기준</h2>
-            </div>
+            <h2 id="upload-title">1. 엑셀 파일 업로드</h2>
             {parsed && <span className="file-chip">{parsed.fileName}</span>}
           </div>
 
@@ -296,15 +234,13 @@ function App() {
               <div className="upload-icon" aria-hidden="true">
                 ↑
               </div>
-              <h3>{busy ? "엑셀을 브라우저에서 읽는 중…" : ".xlsx 파일을 놓아주세요"}</h3>
-              <p>또는 아래 버튼으로 이 기기에서 파일을 선택하세요.</p>
               <button
                 type="button"
-                className="button primary"
+                className="button secondary upload-button"
                 onClick={() => inputRef.current?.click()}
                 disabled={busy}
               >
-                {busy ? "분석 준비 중" : "파일 선택"}
+                {busy ? "불러오는 중…" : "파일 선택"}
               </button>
               <input
                 ref={inputRef}
@@ -314,7 +250,14 @@ function App() {
                 onChange={onFileInput}
                 disabled={busy}
               />
-              <small>지원 형식: Excel 통합 문서(.xlsx)</small>
+              <div className="upload-copy">
+                <strong>
+                  {busy
+                    ? "엑셀을 브라우저에서 읽는 중입니다."
+                    : "이곳에 .xlsx 파일을 놓거나 파일 선택을 눌러주세요."}
+                </strong>
+                <small>지원 형식: Excel 통합 문서(.xlsx)</small>
+              </div>
             </div>
           )}
 
@@ -334,10 +277,7 @@ function App() {
           <>
             <section className="workspace-card" aria-labelledby="recommend-title">
               <div className="section-heading">
-                <div>
-                  <p className="section-kicker">STEP 02</p>
-                  <h2 id="recommend-title">추천 탭 확인</h2>
-                </div>
+                <h2 id="recommend-title">2. 이번·직전 시험 탭 선택</h2>
                 <button
                   type="button"
                   className="text-button"
@@ -454,8 +394,8 @@ function App() {
 
               <div className="confirm-row">
                 <p>
-                  두 탭은 언제든 직접 바꿀 수 있습니다. 선택을 확정해야
-                  이름 매칭과 지역별 분석을 시작합니다.
+                  자동 추천된 탭을 확인하거나 직접 변경한 뒤 분석을
+                  실행하세요.
                 </p>
                 <button
                   type="button"
@@ -463,7 +403,7 @@ function App() {
                   onClick={confirmAndAnalyze}
                   disabled={!currentSheet || !previousSheet || busy}
                 >
-                  선택 확정 후 분석
+                  분석 실행
                   <span aria-hidden="true">→</span>
                 </button>
               </div>
@@ -478,10 +418,7 @@ function App() {
             aria-labelledby="report-title"
           >
             <div className="section-heading">
-              <div>
-                <p className="section-kicker">STEP 03</p>
-                <h2 id="report-title">지역별 비교 보고서</h2>
-              </div>
+              <h2 id="report-title">3. 지역별 비교 보고서</h2>
               <div className="summary-pills">
                 <span>
                   경고 <strong>{analysis.warnings.length}</strong>
