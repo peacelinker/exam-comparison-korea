@@ -8,7 +8,7 @@
 
 - 파일은 `File.arrayBuffer()`로 읽고 현재 브라우저 메모리에서만 처리합니다.
 - `fetch`, 외부 API, 백엔드, 쿠키, 로컬 스토리지, 분석 추적 도구를 사용하지 않습니다.
-- 저장소는 비공개로 유지하며 GitHub Pages를 사용하지 않습니다.
+- GitHub Pages에는 앱 코드만 공개하며, 사용자가 선택한 엑셀은 브라우저 메모리에서만 처리합니다.
 - 새로고침하거나 `새 파일 분석`을 누르면 메모리의 분석 상태가 사라집니다.
 - `.gitignore`는 `.xlsx`, `.xls`, `.xlsm`, `.xlsb`를 제외합니다.
 
@@ -38,18 +38,14 @@ npm run build
 npm run acceptance -- "C:\path\to\private-file.xlsx" 2026-07-23 0.5
 ```
 
-## 비공개 GitHub 공유
+## GitHub Pages 공개 배포
 
-저장소 소유자가 GitHub 사용자명을 기준으로 협업자를 초대합니다. 초대된 사람은 저장소를 복제한 뒤 로컬에서 실행합니다.
+`main` 브랜치에 변경 사항을 푸시하면 테스트와 빌드를 거쳐 GitHub Pages에 자동 배포됩니다.
 
-```bash
-git clone https://github.com/peacelinker/exam-comparison-korea.git
-cd exam-comparison-korea
-npm install
-npm run dev
-```
+- 웹앱: <https://peacelinker.github.io/exam-comparison-korea/>
+- 소스 저장소: <https://github.com/peacelinker/exam-comparison-korea>
 
-공개 웹 배포가 필요하지 않으므로 GitHub Pages는 활성화하지 않습니다.
+저장소와 앱 코드는 공개되지만 엑셀 파일은 저장소에 포함하지 않습니다. 앱에서 고른 엑셀은 외부 서버로 전송하지 않고 해당 브라우저에서만 분석합니다.
 
 ## 주요 구조
 
@@ -63,6 +59,8 @@ src/
   core.test.ts     요구된 단위 테스트
 scripts/
   acceptance.ts    개인정보 비노출 로컬 인수 검산
+.github/workflows/
+  deploy-pages.yml GitHub Pages 자동 테스트·빌드·배포
 ```
 
 ## 판정 원칙
