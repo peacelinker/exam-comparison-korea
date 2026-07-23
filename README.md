@@ -8,7 +8,7 @@
 
 - 파일은 `File.arrayBuffer()`로 읽고 현재 브라우저 메모리에서만 처리합니다.
 - `fetch`, 외부 API, 백엔드, 쿠키, 로컬 스토리지, 분석 추적 도구를 사용하지 않습니다.
-- GitHub Pages는 앱 코드만 배포합니다. 업로드한 엑셀과 이름 목록은 사용자의 브라우저 밖으로 나가지 않습니다.
+- 저장소는 비공개로 유지하며 GitHub Pages를 사용하지 않습니다.
 - 새로고침하거나 `새 파일 분석`을 누르면 메모리의 분석 상태가 사라집니다.
 - `.gitignore`는 `.xlsx`, `.xls`, `.xlsm`, `.xlsb`를 제외합니다.
 
@@ -38,16 +38,18 @@ npm run build
 npm run acceptance -- "C:\path\to\private-file.xlsx" 2026-07-23 0.5
 ```
 
-## GitHub Pages 배포
+## 비공개 GitHub 공유
 
-`.github/workflows/deploy-pages.yml`이 `main` 브랜치 푸시 또는 수동 실행 시 테스트와 빌드 후 Pages에 배포합니다.
+저장소 소유자가 GitHub 사용자명을 기준으로 협업자를 초대합니다. 초대된 사람은 저장소를 복제한 뒤 로컬에서 실행합니다.
 
-Vite `base`는 다음 두 경우를 자동 처리합니다.
+```bash
+git clone https://github.com/peacelinker/exam-comparison-korea.git
+cd exam-comparison-korea
+npm install
+npm run dev
+```
 
-- 일반 저장소: `https://<사용자>.github.io/<저장소>/`
-- 사용자 Pages 저장소: `https://<사용자>.github.io/`
-
-필요하면 빌드 시 `VITE_BASE_PATH=/원하는-경로/`로 명시할 수 있습니다. 클라이언트 라우터를 사용하지 않아 새로고침 404 문제도 없습니다.
+공개 웹 배포가 필요하지 않으므로 GitHub Pages는 활성화하지 않습니다.
 
 ## 주요 구조
 
@@ -61,8 +63,6 @@ src/
   core.test.ts     요구된 단위 테스트
 scripts/
   acceptance.ts    개인정보 비노출 로컬 인수 검산
-.github/workflows/
-  deploy-pages.yml GitHub Pages 배포
 ```
 
 ## 판정 원칙
