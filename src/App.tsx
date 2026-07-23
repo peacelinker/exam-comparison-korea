@@ -31,16 +31,6 @@ const countUnknown = (profile: SheetProfile) =>
     0,
   );
 
-function confidence(profile: SheetProfile, threshold: number) {
-  if (profile.metrics.validStatusRatio >= 0.8) {
-    return { label: "높은 신뢰도", tone: "success" };
-  }
-  if (profile.metrics.validStatusRatio >= threshold) {
-    return { label: "주의", tone: "caution" };
-  }
-  return { label: "불충분", tone: "danger" };
-}
-
 function App() {
   const referenceDate = getSeoulToday();
   const threshold = 0.5;
@@ -342,99 +332,6 @@ function App() {
 
         {parsed && recommendation && (
           <>
-            <section className="workspace-card" aria-labelledby="sheet-table-title">
-              <div className="section-heading">
-                <div>
-                  <p className="section-kicker">TAB QUALITY</p>
-                  <h2 id="sheet-table-title">탭별 입력 상태</h2>
-                </div>
-                <span className="muted-note">
-                  D열에 이름이 있는 행 기준
-                </span>
-              </div>
-              <div className="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>시트 탭</th>
-                      <th>날짜 해석</th>
-                      <th>데이터 행</th>
-                      <th>유효 I열</th>
-                      <th>빈값</th>
-                      <th>알 수 없음</th>
-                      <th>A/D 누락</th>
-                      <th>판정</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {parsed.sheets.map((profile) => {
-                      const date = recommendation.sheetDates.find(
-                        (item) => item.sheetName === profile.name,
-                      )?.date;
-                      const state = confidence(profile, threshold);
-                      const unknownEntries = Object.entries(
-                        profile.metrics.unknownStatusCounts,
-                      );
-                      return (
-                        <tr key={profile.name}>
-                          <td>
-                            <strong>{profile.name}</strong>
-                            {profile.metrics.formulaWithoutCachedValueCount >
-                              0 && (
-                              <small className="cell-warning">
-                                저장값 없는 수식{" "}
-                                {
-                                  profile.metrics
-                                    .formulaWithoutCachedValueCount
-                                }
-                                건
-                              </small>
-                            )}
-                          </td>
-                          <td>{date?.isoDate ?? "—"}</td>
-                          <td>{profile.metrics.dataRowCount.toLocaleString()}</td>
-                          <td>
-                            <strong>
-                              {profile.metrics.validStatusCount.toLocaleString()}
-                            </strong>
-                            <small>
-                              {percent(profile.metrics.validStatusRatio)}
-                            </small>
-                          </td>
-                          <td>
-                            {profile.metrics.blankStatusCount.toLocaleString()}
-                          </td>
-                          <td>
-                            {countUnknown(profile).toLocaleString()}
-                            {unknownEntries.length > 0 && (
-                              <small title={unknownEntries
-                                .map(([value, count]) => `${value} ${count}건`)
-                                .join(", ")}
-                              >
-                                {unknownEntries
-                                  .map(
-                                    ([value, count]) => `${value} ${count}건`,
-                                  )
-                                  .join(", ")}
-                              </small>
-                            )}
-                          </td>
-                          <td>
-                            {profile.metrics.missingRegionOrNameCount.toLocaleString()}
-                          </td>
-                          <td>
-                            <span className={`quality-tag ${state.tone}`}>
-                              {state.label}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-
             <section className="workspace-card" aria-labelledby="recommend-title">
               <div className="section-heading">
                 <div>
