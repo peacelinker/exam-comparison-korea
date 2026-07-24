@@ -337,19 +337,19 @@ function WorshipFlow({
 
           <ReportSnapshot
             title={`${analysis.currentSheet.name} 구역예배 현황`}
-            eyebrow="정식예배자 기준"
+            eyebrow="H열 전체 입력 기준"
             dateLabel={
               analysis.currentDate?.isoDate.replaceAll("-", ". ") ??
               analysis.currentSheet.name
             }
             cards={analysis.regions.map((region) => ({
               title: region.region,
-              caption: `대면 ${region.currentCounts.대면} · 줌 ${region.currentCounts.줌} · 통화 ${region.currentCounts.통화} · 미참여 ${region.currentCounts.미참여}`,
+              caption: `대면 모임 ${region.currentCounts.대면} · 줌 ${region.currentCounts.줌} · 통화 ${region.currentCounts.통화} · 미참여 ${region.currentCounts.미참여}`,
               primaryLabel: "전체 참여",
               primaryValue: `${region.currentCounts.attendedTotal.toLocaleString()}명`,
               metrics: [
                 {
-                  label: "출결재적",
+                  label: "분석 인원",
                   value: `${region.rosterCount.toLocaleString()}명`,
                 },
                 {
@@ -362,14 +362,14 @@ function WorshipFlow({
                 },
               ],
             }))}
-            totalCaption={`대면 ${analysis.totals.currentCounts.대면} · 줌 ${analysis.totals.currentCounts.줌} · 통화 ${analysis.totals.currentCounts.통화} · 미참여 ${analysis.totals.currentCounts.미참여}`}
+            totalCaption={`대면 모임 ${analysis.totals.currentCounts.대면} · 줌 ${analysis.totals.currentCounts.줌} · 통화 ${analysis.totals.currentCounts.통화} · 미참여 ${analysis.totals.currentCounts.미참여}`}
             totalMetrics={[
               {
                 label: "전체 참여",
                 value: `${analysis.totals.currentCounts.attendedTotal.toLocaleString()}명`,
               },
               {
-                label: "대면",
+                label: "대면 모임",
                 value: `${analysis.totals.currentCounts.대면.toLocaleString()}명`,
               },
               {
@@ -383,7 +383,7 @@ function WorshipFlow({
                 value: `${analysis.totals.currentCounts.attendedTotal.toLocaleString()}명`,
               },
               {
-                label: "대면",
+                label: "대면 모임",
                 value: `${analysis.totals.currentCounts.대면.toLocaleString()}명`,
               },
               {
@@ -402,7 +402,7 @@ function WorshipFlow({
               <strong>{analysis.currentSheet.name}</strong>
               <small>
                 {selectedDate(recommendation, analysis.currentSheet.name)} · H열
-                입력률 {percent(analysis.currentMetrics.validInputRatio)}
+                입력률 {percent(analysis.currentInputMetrics.validInputRatio)}
               </small>
             </div>
             <div>
@@ -410,7 +410,7 @@ function WorshipFlow({
               <strong>{analysis.previousSheet.name}</strong>
               <small>
                 {selectedDate(recommendation, analysis.previousSheet.name)} ·
-                H열 입력률 {percent(analysis.previousMetrics.validInputRatio)}
+                H열 입력률 {percent(analysis.previousInputMetrics.validInputRatio)}
               </small>
             </div>
             <p>
