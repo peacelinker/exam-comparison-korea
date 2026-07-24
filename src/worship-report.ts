@@ -32,11 +32,11 @@ export function buildWorshipRegionReport(
   const previous = region.previousCounts;
   const transitions = region.transitions;
 
-  return `• ${regionLabel(region.region)} (출결재적 ${region.rosterCount}명)
+  return `• ${regionLabel(region.region)} (분석 인원 ${region.rosterCount}명)
 
-1. 출결재적 전체 참여 : ${current.attendedTotal}명 (${formatParticipationRate(region.participationRate)}%)
+1. 전체 참여 : ${current.attendedTotal}명 (${formatParticipationRate(region.participationRate)}%)
 (지난 구역예배 대비 ${formatWorshipDelta(current.attendedTotal - previous.attendedTotal)})
-- 대면 : ${current.대면}명 (지난 구역예배 대비 ${formatWorshipDelta(current.대면 - previous.대면)})
+- 대면 모임 : ${current.대면}명 (지난 구역예배 대비 ${formatWorshipDelta(current.대면 - previous.대면)})
 - 줌 : ${current.줌}명
 - 통화 : ${current.통화}명
 
@@ -93,9 +93,9 @@ export function buildWorshipCsv(
 ): string {
   const header = [
     "지역",
-    "출결재적",
+    "분석 인원",
     "전체 참여",
-    "대면",
+    "대면 모임",
     "줌",
     "통화",
     "미참여",
