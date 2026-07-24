@@ -227,10 +227,3 @@ export interface WorshipAnalysisResult {
   warnings: string[];
   excludedCount: number;
 }
-
-export interface WorshipGoal {
-  total?: number;
-  face?: number;
-}
-
-export type WorshipGoals = Record<string, WorshipGoal>;
