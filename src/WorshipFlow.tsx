@@ -6,7 +6,6 @@ import {
 import type {
   ParsedWorkbook,
   WorshipAnalysisResult,
-  WorshipGoals,
   WorshipRegionAnalysis,
 } from "./types";
 import {
@@ -21,6 +20,7 @@ import {
   buildSingleWorshipReport,
   buildWorshipCsv,
 } from "./worship-report";
+import ReportSnapshot from "./ReportSnapshot";
 
 interface WorshipFlowProps {
   parsed: ParsedWorkbook;
@@ -60,7 +60,6 @@ function WorshipFlow({
   const [manualSelection, setManualSelection] = useState(false);
   const [analysis, setAnalysis] = useState<WorshipAnalysisResult | null>(null);
   const [selectedRegion, setSelectedRegion] = useState("");
-  const [goals, setGoals] = useState<WorshipGoals>({});
 
   const recommendation = useMemo(
     () => recommendWorshipSheets(parsed.sheets, referenceDate, threshold),
@@ -71,7 +70,6 @@ function WorshipFlow({
     setManualSelection(false);
     setAnalysis(null);
     setSelectedRegion("");
-    setGoals({});
   }, [parsed, uploadDate]);
 
   useEffect(() => {
@@ -102,9 +100,9 @@ function WorshipFlow({
   );
   const visibleReport =
     analysis && selectedRegionAnalysis
-      ? buildSingleWorshipReport(selectedRegionAnalysis, goals)
+      ? buildSingleWorshipReport(selectedRegionAnalysis)
       : analysis
-        ? buildFullWorshipReport(analysis, goals)
+        ? buildFullWorshipReport(analysis)
         : "";
 
   function restoreRecommendation() {
@@ -128,13 +126,6 @@ function WorshipFlow({
       );
       setAnalysis(result);
       setSelectedRegion("");
-      setGoals((existing) => {
-        const next = { ...existing };
-        for (const region of result.regions) {
-          next[region.region] ??= {};
-        }
-        return next;
-      });
       window.setTimeout(
         () =>
           document
@@ -333,7 +324,7 @@ function WorshipFlow({
           aria-labelledby="worship-report-title"
         >
           <div className="section-heading">
-            <h2 id="worship-report-title">4. 목표 입력 및 지역별 보고서</h2>
+            <h2 id="worship-report-title">4. 최종 구역예배 보고서</h2>
             <div className="summary-pills">
               <span>
                 경고 <strong>{analysis.warnings.length}</strong>
@@ -344,59 +335,66 @@ function WorshipFlow({
             </div>
           </div>
 
-          <div className="worship-summary-grid" aria-label="전체 지역 요약">
-            <div>
-              <span>총 출결재적</span>
-              <strong>{analysis.totals.rosterCount.toLocaleString()}명</strong>
-            </div>
-            <div>
-              <span>전체 참여</span>
-              <strong>
-                {analysis.totals.currentCounts.attendedTotal.toLocaleString()}명
-              </strong>
-            </div>
-            <div>
-              <span>대면</span>
-              <strong>{analysis.totals.currentCounts.대면.toLocaleString()}명</strong>
-            </div>
-            <div>
-              <span>줌</span>
-              <strong>{analysis.totals.currentCounts.줌.toLocaleString()}명</strong>
-            </div>
-            <div>
-              <span>통화</span>
-              <strong>{analysis.totals.currentCounts.통화.toLocaleString()}명</strong>
-            </div>
-            <div>
-              <span>미참여</span>
-              <strong>
-                {analysis.totals.currentCounts.미참여.toLocaleString()}명
-              </strong>
-            </div>
-            <div>
-              <span>전체 참여율</span>
-              <strong>
-                {formatParticipationRate(analysis.totals.participationRate)}%
-              </strong>
-            </div>
-            <div>
-              <span>지난 구역예배 대비</span>
-              <strong
-                className={
-                  analysis.totals.currentCounts.attendedTotal -
-                    analysis.totals.previousCounts.attendedTotal >=
-                  0
-                    ? "positive"
-                    : "negative"
-                }
-              >
-                {formatWorshipDelta(
+          <ReportSnapshot
+            title={`${analysis.currentSheet.name} 구역예배 현황`}
+            eyebrow="정식예배자 기준"
+            dateLabel={
+              analysis.currentDate?.isoDate.replaceAll("-", ". ") ??
+              analysis.currentSheet.name
+            }
+            cards={analysis.regions.map((region) => ({
+              title: region.region,
+              caption: `대면 ${region.currentCounts.대면} · 줌 ${region.currentCounts.줌} · 통화 ${region.currentCounts.통화} · 미참여 ${region.currentCounts.미참여}`,
+              primaryLabel: "전체 참여",
+              primaryValue: `${region.currentCounts.attendedTotal.toLocaleString()}명`,
+              metrics: [
+                {
+                  label: "출결재적",
+                  value: `${region.rosterCount.toLocaleString()}명`,
+                },
+                {
+                  label: "참여율",
+                  value: `${formatParticipationRate(region.participationRate)}%`,
+                },
+                {
+                  label: "지난 참여",
+                  value: `${region.previousCounts.attendedTotal.toLocaleString()}명`,
+                },
+              ],
+            }))}
+            totalCaption={`대면 ${analysis.totals.currentCounts.대면} · 줌 ${analysis.totals.currentCounts.줌} · 통화 ${analysis.totals.currentCounts.통화} · 미참여 ${analysis.totals.currentCounts.미참여}`}
+            totalMetrics={[
+              {
+                label: "전체 참여",
+                value: `${analysis.totals.currentCounts.attendedTotal.toLocaleString()}명`,
+              },
+              {
+                label: "대면",
+                value: `${analysis.totals.currentCounts.대면.toLocaleString()}명`,
+              },
+              {
+                label: "참여율",
+                value: `${formatParticipationRate(analysis.totals.participationRate)}%`,
+              },
+            ]}
+            keyStats={[
+              {
+                label: "전체 참여",
+                value: `${analysis.totals.currentCounts.attendedTotal.toLocaleString()}명`,
+              },
+              {
+                label: "대면",
+                value: `${analysis.totals.currentCounts.대면.toLocaleString()}명`,
+              },
+              {
+                label: "지난 구역예배 대비",
+                value: formatWorshipDelta(
                   analysis.totals.currentCounts.attendedTotal -
                     analysis.totals.previousCounts.attendedTotal,
-                )}
-              </strong>
-            </div>
-          </div>
+                ),
+              },
+            ]}
+          />
 
           <div className="selection-audit">
             <div>
@@ -420,43 +418,6 @@ function WorshipFlow({
                 ? "사용자가 직접 선택한 탭으로 분석했습니다."
                 : recommendation.currentReason}
             </p>
-          </div>
-
-          <div className="subsection-heading">
-            <div>
-              <h3>지역별 상태 요약</h3>
-              <p>미리볼 지역과 동일한 고정 순서로 표시합니다.</p>
-            </div>
-          </div>
-          <div className="table-scroll">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th scope="col">지역</th>
-                  <th scope="col">출결재적</th>
-                  <th scope="col">전체 참여</th>
-                  <th scope="col">대면</th>
-                  <th scope="col">줌</th>
-                  <th scope="col">통화</th>
-                  <th scope="col">미참여</th>
-                  <th scope="col">참여율</th>
-                </tr>
-              </thead>
-              <tbody>
-                {analysis.regions.map((region) => (
-                  <tr key={region.region}>
-                    <th scope="row">{region.region}</th>
-                    <td>{region.rosterCount}</td>
-                    <td>{region.currentCounts.attendedTotal}</td>
-                    <td>{region.currentCounts.대면}</td>
-                    <td>{region.currentCounts.줌}</td>
-                    <td>{region.currentCounts.통화}</td>
-                    <td>{region.currentCounts.미참여}</td>
-                    <td>{formatParticipationRate(region.participationRate)}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
 
           {analysis.warnings.length > 0 && (
@@ -494,6 +455,13 @@ function WorshipFlow({
             </details>
           )}
 
+          <div className="subsection-heading detailed-report-heading">
+            <div>
+              <h3>상세 보고서</h3>
+              <p>지역을 선택해 참여 변화와 명단을 자세히 확인할 수 있습니다.</p>
+            </div>
+          </div>
+
           <div className="report-toolbar">
             <label>
               <span>미리볼 지역</span>
@@ -517,7 +485,7 @@ function WorshipFlow({
                 onClick={() =>
                   selectedRegionAnalysis &&
                   void copyReport(
-                    buildSingleWorshipReport(selectedRegionAnalysis, goals),
+                    buildSingleWorshipReport(selectedRegionAnalysis),
                     "선택한 지역 보고서를 복사했습니다.",
                   )
                 }
@@ -529,7 +497,7 @@ function WorshipFlow({
                 className="button secondary"
                 onClick={() =>
                   void copyReport(
-                    buildFullWorshipReport(analysis, goals),
+                    buildFullWorshipReport(analysis),
                     "전체 지역 보고서를 복사했습니다.",
                   )
                 }
@@ -541,7 +509,7 @@ function WorshipFlow({
                 className="button primary"
                 onClick={() =>
                   downloadText(
-                    buildFullWorshipReport(analysis, goals),
+                    buildFullWorshipReport(analysis),
                     `구역예배비교_${safeFilePart(analysis.currentDate?.isoDate ?? analysis.currentSheet.name)}.txt`,
                     "text/plain;charset=utf-8",
                     "구역예배 보고서를 TXT로 저장했습니다.",
@@ -555,7 +523,7 @@ function WorshipFlow({
                 className="button secondary"
                 onClick={() =>
                   downloadText(
-                    `\uFEFF${buildWorshipCsv(analysis, goals)}`,
+                    `\uFEFF${buildWorshipCsv(analysis)}`,
                     `구역예배분석_${safeFilePart(analysis.currentDate?.isoDate ?? analysis.currentSheet.name)}.csv`,
                     "text/csv;charset=utf-8",
                     "분석 결과를 CSV로 저장했습니다.",
