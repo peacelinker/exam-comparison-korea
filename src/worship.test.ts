@@ -250,10 +250,31 @@ describe("사람 연결과 집계", () => {
       [worshipRow("서대문", "나래", "줌")],
     );
     expect(result.matches.unmatchedCurrentNames).toEqual(["가람"]);
+    expect(result.totals.previousCounts.줌).toBe(1);
     expect(result.totals.transitions.absentToFace).toEqual(["가람"]);
   });
 
-  it("19. G열 값과 무관하게 H열 전체 명단을 실제 셀 기준으로 집계한다", () => {
+  it("19. 과거 지역 현황은 현재 명단 매칭과 무관하게 과거 탭의 지역·H열로 집계한다", () => {
+    const result = analysisFor(
+      [
+        worshipRow("마포", "가람", "대면"),
+        worshipRow("서대문", "다온", "통화"),
+      ],
+      [
+        worshipRow("서대문", "가람", "줌"),
+        worshipRow("신촌", "나래", "대면"),
+      ],
+    );
+    const seodaemun = result.regions.find(
+      (region) => region.region === "서대문",
+    );
+    const sinchon = result.regions.find((region) => region.region === "신촌");
+    expect(seodaemun?.previousCounts.줌).toBe(1);
+    expect(sinchon?.previousCounts.대면).toBe(1);
+    expect(result.totals.previousCounts.attendedTotal).toBe(2);
+  });
+
+  it("20. G열 값과 무관하게 H열 전체 명단을 실제 셀 기준으로 집계한다", () => {
     const result = analysisFor(
       [
         worshipRow("서대문", "가람", "대면"),
@@ -276,7 +297,7 @@ describe("사람 연결과 집계", () => {
     expect(result.totals.participationRate).toBe(0.8);
   });
 
-  it("20. 증가·하락·변동 없음 문구를 만든다", () => {
+  it("21. 증가·하락·변동 없음 문구를 만든다", () => {
     expect(formatWorshipDelta(2)).toBe("2명 증가");
     expect(formatWorshipDelta(-1)).toBe("1명 하락");
     expect(formatWorshipDelta(0)).toBe("변동 없음");
