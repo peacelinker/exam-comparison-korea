@@ -1,7 +1,5 @@
 import type {
   WorshipAnalysisResult,
-  WorshipGoal,
-  WorshipGoals,
   WorshipRegionAnalysis,
 } from "./types";
 import {
@@ -11,10 +9,6 @@ import {
 
 function namesLine(names: string[]): string {
   return `- ${names.length > 0 ? names.join(", ") : "없음"}`;
-}
-
-function targetLabel(value: number | undefined): string {
-  return value == null ? "미설정" : `${value}명`;
 }
 
 function regionLabel(region: string): string {
@@ -33,7 +27,6 @@ function attendedFromAbsentTotal(region: WorshipRegionAnalysis): number {
 
 export function buildWorshipRegionReport(
   region: WorshipRegionAnalysis,
-  goal: WorshipGoal = {},
 ): string {
   const current = region.currentCounts;
   const previous = region.previousCounts;
@@ -42,8 +35,8 @@ export function buildWorshipRegionReport(
   return `• ${regionLabel(region.region)} (출결재적 ${region.rosterCount}명)
 
 1. 출결재적 전체 참여 : ${current.attendedTotal}명 (${formatParticipationRate(region.participationRate)}%)
-(목표 : ${targetLabel(goal.total)}, 지난 구역예배 대비 ${formatWorshipDelta(current.attendedTotal - previous.attendedTotal)})
-- 대면 : ${current.대면}명 (목표 : ${targetLabel(goal.face)}, 지난 구역예배 대비 ${formatWorshipDelta(current.대면 - previous.대면)})
+(지난 구역예배 대비 ${formatWorshipDelta(current.attendedTotal - previous.attendedTotal)})
+- 대면 : ${current.대면}명 (지난 구역예배 대비 ${formatWorshipDelta(current.대면 - previous.대면)})
 - 줌 : ${current.줌}명
 - 통화 : ${current.통화}명
 
@@ -78,18 +71,16 @@ ${namesLine(transitions.absentToCall)}`;
 
 export function buildFullWorshipReport(
   analysis: WorshipAnalysisResult,
-  goals: WorshipGoals,
 ): string {
   return analysis.regions
-    .map((region) => buildWorshipRegionReport(region, goals[region.region]))
+    .map((region) => buildWorshipRegionReport(region))
     .join("\n\n────────────────────\n\n");
 }
 
 export function buildSingleWorshipReport(
   region: WorshipRegionAnalysis,
-  goals: WorshipGoals,
 ): string {
-  return buildWorshipRegionReport(region, goals[region.region]);
+  return buildWorshipRegionReport(region);
 }
 
 function csvCell(value: string | number): string {
@@ -99,7 +90,6 @@ function csvCell(value: string | number): string {
 
 export function buildWorshipCsv(
   analysis: WorshipAnalysisResult,
-  goals: WorshipGoals,
 ): string {
   const header = [
     "지역",
@@ -111,11 +101,8 @@ export function buildWorshipCsv(
     "미참여",
     "참여율",
     "지난 구역예배 대비",
-    "전체 참여 목표",
-    "대면 참여 목표",
   ];
   const rows = [analysis.totals, ...analysis.regions].map((region) => {
-    const goal = goals[region.region] ?? {};
     return [
       region.region,
       region.rosterCount,
@@ -129,8 +116,6 @@ export function buildWorshipCsv(
         region.currentCounts.attendedTotal -
           region.previousCounts.attendedTotal,
       ),
-      goal.total ?? "",
-      goal.face ?? "",
     ];
   });
   return [header, ...rows]
