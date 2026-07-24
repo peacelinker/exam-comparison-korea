@@ -689,14 +689,6 @@ footer {
   background: #fff3cf;
 }
 
-.worship-date-row {
-  display: grid;
-  grid-template-columns: minmax(240px, 1fr) minmax(280px, 1fr);
-  gap: 18px;
-  margin-bottom: 18px;
-}
-
-input[type="date"],
 input[type="number"] {
   width: 100%;
   min-height: 42px;
@@ -708,48 +700,9 @@ input[type="number"] {
   background: #ffffff;
 }
 
-input[type="date"]:focus,
-input[type="number"]:focus,
-input[type="range"]:focus-visible {
+input[type="number"]:focus {
   border-color: var(--blue);
   box-shadow: 0 0 0 2px rgba(0, 104, 201, 0.12);
-}
-
-.advanced-settings {
-  align-self: start;
-  padding: 11px 13px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fafbfc;
-}
-
-.advanced-settings summary {
-  cursor: pointer;
-  color: #555965;
-  font-size: 12px;
-  font-weight: 650;
-}
-
-.advanced-settings label {
-  margin-top: 12px;
-}
-
-.threshold-control {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.threshold-control input {
-  flex: 1;
-}
-
-.threshold-control output {
-  min-width: 46px;
-  color: var(--blue-dark);
-  font-size: 12px;
-  font-weight: 750;
-  text-align: right;
 }
 
 .worship-summary-grid {
@@ -1004,7 +957,6 @@ input[type="range"]:focus-visible {
   .report-meta-grid,
   .name-list-grid,
   .analysis-type-tabs,
-  .worship-date-row,
   .selection-audit {
     grid-template-columns: 1fr;
   }

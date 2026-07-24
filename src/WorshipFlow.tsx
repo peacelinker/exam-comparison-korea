@@ -53,8 +53,8 @@ function WorshipFlow({
   onToast,
   onReset,
 }: WorshipFlowProps) {
-  const [referenceDate, setReferenceDate] = useState(uploadDate);
-  const [threshold, setThreshold] = useState(0.5);
+  const referenceDate = uploadDate;
+  const threshold = 0.5;
   const [currentSheet, setCurrentSheet] = useState("");
   const [previousSheet, setPreviousSheet] = useState("");
   const [manualSelection, setManualSelection] = useState(false);
@@ -68,8 +68,6 @@ function WorshipFlow({
   );
 
   useEffect(() => {
-    setReferenceDate(uploadDate);
-    setThreshold(0.5);
     setManualSelection(false);
     setAnalysis(null);
     setSelectedRegion("");
@@ -231,44 +229,6 @@ function WorshipFlow({
               자동 추천으로 되돌리기
             </button>
           </div>
-        </div>
-
-        <div className="worship-date-row">
-          <label>
-            <span>최근 구역예배일</span>
-            <input
-              type="date"
-              value={referenceDate}
-              onChange={(event) => {
-                setReferenceDate(event.target.value);
-                setManualSelection(false);
-                setAnalysis(null);
-              }}
-            />
-            <small>한국 날짜 기준으로 자동 추천을 다시 계산합니다.</small>
-          </label>
-          <details className="advanced-settings">
-            <summary>고급 설정</summary>
-            <label>
-              <span>H열 유효 입력률 기준</span>
-              <div className="threshold-control">
-                <input
-                  type="range"
-                  min="10"
-                  max="100"
-                  step="5"
-                  value={Math.round(threshold * 100)}
-                  aria-label="H열 유효 입력률 기준"
-                  onChange={(event) => {
-                    setThreshold(Number(event.target.value) / 100);
-                    setManualSelection(false);
-                    setAnalysis(null);
-                  }}
-                />
-                <output>{Math.round(threshold * 100)}%</output>
-              </div>
-            </label>
-          </details>
         </div>
 
         <div className="recommend-grid">
