@@ -847,17 +847,6 @@ input[type="number"]:focus {
   background: #fbfcfd;
 }
 
-.goal-table {
-  min-width: 520px;
-}
-
-.goal-table input {
-  max-width: 160px;
-  min-height: 36px;
-  margin-left: auto;
-  text-align: right;
-}
-
 @media (max-width: 900px) {
   .report-meta-grid {
     grid-template-columns: repeat(2, 1fr);
