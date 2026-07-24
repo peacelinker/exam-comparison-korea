@@ -12,7 +12,7 @@ const threshold = Number(process.argv[4] ?? "0.5");
 
 if (!filePath) {
   throw new Error(
-    '사용법: pnpm acceptance:worship -- "파일.xlsx" [최근 구역예배일] [입력률 기준]',
+    '사용법: pnpm acceptance:worship -- "파일.xlsx" [기준일] [입력률 기준]',
   );
 }
 
@@ -25,7 +25,9 @@ const recommendation = recommendWorshipSheets(
 );
 
 if (!recommendation.currentSheet || !recommendation.previousSheet) {
-  throw new Error("자동 추천 결과가 확정되지 않아 인수 분석을 진행할 수 없습니다.");
+  throw new Error(
+    "자동 추천 결과가 확정되지 않아 인수 분석을 진행할 수 없습니다.",
+  );
 }
 
 const analysis = analyzeWorshipComparison(
@@ -45,27 +47,27 @@ console.log(
         reason: recommendation.currentReason,
       },
       inputQuality: {
-        currentOfficial: analysis.currentMetrics.officialCount,
+        currentRows: analysis.currentInputMetrics.personCount,
         currentValidRatio: Number(
-          analysis.currentMetrics.validInputRatio.toFixed(6),
+          analysis.currentInputMetrics.validInputRatio.toFixed(6),
         ),
-        previousOfficial: analysis.previousMetrics.officialCount,
+        previousRows: analysis.previousInputMetrics.personCount,
         previousValidRatio: Number(
-          analysis.previousMetrics.validInputRatio.toFixed(6),
+          analysis.previousInputMetrics.validInputRatio.toFixed(6),
         ),
       },
       totals: {
-        roster: analysis.totals.rosterCount,
-        attended: analysis.totals.currentCounts.attendedTotal,
-        face: analysis.totals.currentCounts.대면,
-        zoom: analysis.totals.currentCounts.줌,
-        call: analysis.totals.currentCounts.통화,
-        absent: analysis.totals.currentCounts.미참여,
+        current: analysis.totals.currentCounts,
+        previous: analysis.totals.previousCounts,
+        attendedDelta:
+          analysis.totals.currentCounts.attendedTotal -
+          analysis.totals.previousCounts.attendedTotal,
       },
       regions: analysis.regions.map((region) => ({
         region: region.region,
         roster: region.rosterCount,
-        attended: region.currentCounts.attendedTotal,
+        current: region.currentCounts,
+        previous: region.previousCounts,
       })),
       warningCount: analysis.warnings.length,
     },
