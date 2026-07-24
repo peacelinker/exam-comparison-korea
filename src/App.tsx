@@ -8,6 +8,7 @@ import {
 } from "react";
 import {
   analyzeComparison,
+  formatDelta,
   getSeoulToday,
   recommendSheets,
 } from "./core";
@@ -21,6 +22,7 @@ import type {
   ParsedWorkbook,
   SheetProfile,
 } from "./types";
+import ReportSnapshot from "./ReportSnapshot";
 import WorshipFlow from "./WorshipFlow";
 
 const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
@@ -460,7 +462,7 @@ function App() {
             aria-labelledby="report-title"
           >
             <div className="section-heading">
-              <h2 id="report-title">4. 지역별 비교 보고서</h2>
+              <h2 id="report-title">4. 최종 시험 보고서</h2>
               <div className="summary-pills">
                 <span>
                   경고 <strong>{analysis.warnings.length}</strong>
@@ -471,74 +473,69 @@ function App() {
               </div>
             </div>
 
-            <div className="report-meta-grid">
-              <div>
-                <span>이번 시험</span>
-                <strong>{analysis.currentSheet.name}</strong>
-                <small>
-                  {analysis.currentDate?.isoDate ?? "날짜 해석 없음"} · 입력률{" "}
-                  {percent(analysis.currentSheet.metrics.validStatusRatio)}
-                </small>
-              </div>
-              <div>
-                <span>직전 시험</span>
-                <strong>{analysis.previousSheet.name}</strong>
-                <small>
-                  {analysis.previousDate?.isoDate ?? "날짜 해석 없음"} · 입력률{" "}
-                  {percent(analysis.previousSheet.metrics.validStatusRatio)}
-                </small>
-              </div>
-              <div>
-                <span>전체 응시자 증감</span>
-                <strong
-                  className={
+            <ReportSnapshot
+              title={`${analysis.currentSheet.name} 시험 응시 현황`}
+              eyebrow="정식예배자 기준"
+              dateLabel={
+                analysis.currentDate?.isoDate.replaceAll("-", ". ") ??
+                analysis.currentSheet.name
+              }
+              cards={analysis.regions.map((region) => ({
+                title: region.region,
+                caption: `일대일 ${region.currentCounts.일대일응시} · 서면 ${region.currentCounts.서면응시} · 비공식 ${region.currentCounts.비공식응시} · 미응시 ${region.currentCounts.미응시}`,
+                primaryLabel: "전체 응시",
+                primaryValue: `${region.currentCounts.attendedTotal.toLocaleString()}명`,
+                metrics: [
+                  {
+                    label: "정규군",
+                    value: `${region.currentCounts.regularGroup.toLocaleString()}명`,
+                  },
+                  {
+                    label: "직전 시험",
+                    value: `${region.previousCounts.attendedTotal.toLocaleString()}명`,
+                  },
+                  {
+                    label: "증감",
+                    value: formatDelta(
+                      region.currentCounts.attendedTotal -
+                        region.previousCounts.attendedTotal,
+                    ),
+                  },
+                ],
+              }))}
+              totalCaption={`일대일 ${analysis.currentTotals.일대일응시} · 서면 ${analysis.currentTotals.서면응시} · 비공식 ${analysis.currentTotals.비공식응시} · 미응시 ${analysis.currentTotals.미응시}`}
+              totalMetrics={[
+                {
+                  label: "전체 응시",
+                  value: `${analysis.currentTotals.attendedTotal.toLocaleString()}명`,
+                },
+                {
+                  label: "정규군",
+                  value: `${analysis.currentTotals.regularGroup.toLocaleString()}명`,
+                },
+                {
+                  label: "직전 시험",
+                  value: `${analysis.previousTotals.attendedTotal.toLocaleString()}명`,
+                },
+              ]}
+              keyStats={[
+                {
+                  label: "전체 응시",
+                  value: `${analysis.currentTotals.attendedTotal.toLocaleString()}명`,
+                },
+                {
+                  label: "정규군",
+                  value: `${analysis.currentTotals.regularGroup.toLocaleString()}명`,
+                },
+                {
+                  label: "직전 시험 대비",
+                  value: formatDelta(
                     analysis.currentTotals.attendedTotal -
-                      analysis.previousTotals.attendedTotal >=
-                    0
-                      ? "positive"
-                      : "negative"
-                  }
-                >
-                  {analysis.currentTotals.attendedTotal -
-                    analysis.previousTotals.attendedTotal >
-                  0
-                    ? "+"
-                    : ""}
-                  {analysis.currentTotals.attendedTotal -
-                    analysis.previousTotals.attendedTotal}
-                  명
-                </strong>
-                <small>
-                  {analysis.previousTotals.attendedTotal.toLocaleString()} →{" "}
-                  {analysis.currentTotals.attendedTotal.toLocaleString()}
-                </small>
-              </div>
-              <div>
-                <span>정규군 증감</span>
-                <strong
-                  className={
-                    analysis.currentTotals.regularGroup -
-                      analysis.previousTotals.regularGroup >=
-                    0
-                      ? "positive"
-                      : "negative"
-                  }
-                >
-                  {analysis.currentTotals.regularGroup -
-                    analysis.previousTotals.regularGroup >
-                  0
-                    ? "+"
-                    : ""}
-                  {analysis.currentTotals.regularGroup -
-                    analysis.previousTotals.regularGroup}
-                  명
-                </strong>
-                <small>
-                  {analysis.previousTotals.regularGroup.toLocaleString()} →{" "}
-                  {analysis.currentTotals.regularGroup.toLocaleString()}
-                </small>
-              </div>
-            </div>
+                      analysis.previousTotals.attendedTotal,
+                  ),
+                },
+              ]}
+            />
 
             {analysis.warnings.length > 0 && (
               <details className="analysis-warnings" open>
@@ -582,6 +579,13 @@ function App() {
                 )}
               </details>
             )}
+
+            <div className="subsection-heading detailed-report-heading">
+              <div>
+                <h3>상세 보고서</h3>
+                <p>지역을 선택해 명단과 증감 원인을 자세히 확인할 수 있습니다.</p>
+              </div>
+            </div>
 
             <div className="report-toolbar">
               <label>
