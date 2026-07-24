@@ -151,6 +151,16 @@ export interface WorshipSheetMetrics {
   columnsReadable: boolean;
 }
 
+export interface WorshipInputMetrics {
+  personCount: number;
+  validInputCount: number;
+  blankInputCount: number;
+  validInputRatio: number;
+  unknownStatusCounts: Record<string, number>;
+  duplicatePersonCount: number;
+  missingRegionCount: number;
+}
+
 export interface WorshipDateInfo {
   sheetName: string;
   isoDate: string;
@@ -221,6 +231,8 @@ export interface WorshipAnalysisResult {
   previousDate?: WorshipDateInfo;
   currentMetrics: WorshipSheetMetrics;
   previousMetrics: WorshipSheetMetrics;
+  currentInputMetrics: WorshipInputMetrics;
+  previousInputMetrics: WorshipInputMetrics;
   regions: WorshipRegionAnalysis[];
   totals: WorshipRegionAnalysis;
   matches: WorshipMatchSummary;
