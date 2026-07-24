@@ -5,6 +5,7 @@ import {
   type WorshipAnalysisResult,
   type WorshipCounts,
   type WorshipDateInfo,
+  type WorshipInputMetrics,
   type WorshipPerson,
   type WorshipRecommendation,
   type WorshipRegionAnalysis,
@@ -124,6 +125,41 @@ function chooseRows(
     people: [...selected.values()].map((item) => item.person),
     duplicatePersonCount: duplicateKeys.size,
     missingRegionCount: missingRegionKeys.size,
+  };
+}
+
+function calculateAllInputMetrics(
+  profile: SheetProfile,
+): WorshipInputMetrics {
+  const prepared = chooseRows(profile, false);
+  let validInputCount = 0;
+  let blankInputCount = 0;
+  const unknownStatusCounts: Record<string, number> = {};
+
+  for (const person of prepared.people) {
+    const classified = classifyWorshipStatus(person.rawStatus);
+    if (classified.validInput) {
+      validInputCount += 1;
+    } else if (!normalizeStatusKey(person.rawStatus)) {
+      blankInputCount += 1;
+    } else if (classified.unknown) {
+      const label = person.rawStatus || "(빈 값)";
+      unknownStatusCounts[label] =
+        (unknownStatusCounts[label] ?? 0) + 1;
+    }
+  }
+
+  return {
+    personCount: prepared.people.length,
+    validInputCount,
+    blankInputCount,
+    validInputRatio:
+      prepared.people.length === 0
+        ? 0
+        : validInputCount / prepared.people.length,
+    unknownStatusCounts,
+    duplicatePersonCount: prepared.duplicatePersonCount,
+    missingRegionCount: prepared.missingRegionCount,
   };
 }
 
@@ -518,7 +554,9 @@ function buildRegionAnalysis(
   };
 }
 
-function unknownCount(metrics: WorshipSheetMetrics): number {
+function unknownCount(
+  metrics: Pick<WorshipSheetMetrics, "unknownStatusCounts">,
+): number {
   return Object.values(metrics.unknownStatusCounts).reduce(
     (sum, count) => sum + count,
     0,
@@ -560,18 +598,20 @@ export function analyzeWorshipComparison(
 
   const currentMetrics = calculateWorshipSheetMetrics(currentSheet);
   const previousMetrics = calculateWorshipSheetMetrics(previousSheet);
-  if (currentMetrics.officialCount === 0) {
+  const currentInputMetrics = calculateAllInputMetrics(currentSheet);
+  const previousInputMetrics = calculateAllInputMetrics(previousSheet);
+  if (currentInputMetrics.personCount === 0) {
     throw new Error(
-      "금번 탭에서 G열 기준 정식예배자를 찾지 못했습니다. 탭 선택을 확인해 주세요.",
+      "금번 탭에서 D열 이름이 입력된 분석 대상을 찾지 못했습니다. 탭 선택을 확인해 주세요.",
     );
   }
-  if (currentMetrics.validInputCount === 0) {
+  if (currentInputMetrics.validInputCount === 0) {
     throw new Error(
-      "금번 탭의 정식예배자 H열에 인식 가능한 구역예배 입력이 없습니다. 자료 입력 또는 탭 선택을 확인해 주세요.",
+      "금번 탭의 H열에 인식 가능한 구역예배 입력이 없습니다. 자료 입력 또는 탭 선택을 확인해 주세요.",
     );
   }
 
-  const currentPrepared = chooseRows(currentSheet, true);
+  const currentPrepared = chooseRows(currentSheet, false);
   const previousPrepared = chooseRows(previousSheet, false);
   const previousByKey = new Map(
     previousPrepared.people.map((person) => [
@@ -660,8 +700,8 @@ export function analyzeWorshipComparison(
 
   const warnings: string[] = [];
   for (const [label, metrics] of [
-    ["금번", currentMetrics],
-    ["지난", previousMetrics],
+    ["금번", currentInputMetrics],
+    ["지난", previousInputMetrics],
   ] as const) {
     if (metrics.validInputRatio < threshold) {
       warnings.push(
@@ -670,7 +710,7 @@ export function analyzeWorshipComparison(
     }
     if (metrics.blankInputCount > 0) {
       warnings.push(
-        `${label} 탭의 정식예배자 중 H열 빈값 ${metrics.blankInputCount}명은 미참여로 처리했습니다.`,
+        `${label} 탭의 H열 빈값 ${metrics.blankInputCount}명은 미참여로 처리했습니다.`,
       );
     }
     if (unknownCount(metrics) > 0) {
@@ -688,7 +728,7 @@ export function analyzeWorshipComparison(
     }
     if (metrics.missingRegionCount > 0) {
       warnings.push(
-        `${label} 탭의 지역 미지정 정식예배자 ${metrics.missingRegionCount}명을 ‘지역 미지정’으로 분류했습니다.`,
+        `${label} 탭의 지역 미지정 인원 ${metrics.missingRegionCount}명을 ‘지역 미지정’으로 분류했습니다.`,
       );
     }
   }
@@ -699,7 +739,7 @@ export function analyzeWorshipComparison(
   }
   if (unmatchedCurrentNames.length > 0) {
     warnings.push(
-      `지난 탭에서 찾지 못한 현재 정식예배자 ${uniqueSorted(unmatchedCurrentNames).length}명은 지난 상태를 미참여로 처리했습니다.`,
+      `지난 탭에서 찾지 못한 현재 인원 ${uniqueSorted(unmatchedCurrentNames).length}명은 지난 상태를 미참여로 처리했습니다.`,
     );
   }
   if (movedNames.length > 0) {
@@ -709,7 +749,7 @@ export function analyzeWorshipComparison(
   }
   if (excludedPreviousCount > 0) {
     warnings.push(
-      `지난 탭에는 있지만 현재 정식예배자 명단에 없는 ${excludedPreviousCount}명은 분석에서 제외했습니다.`,
+      `지난 탭에는 있지만 현재 명단에 없는 ${excludedPreviousCount}명은 분석에서 제외했습니다.`,
     );
   }
 
@@ -720,6 +760,8 @@ export function analyzeWorshipComparison(
     previousDate: interpretWorshipTabDate(previousSheet.name, referenceIsoDate),
     currentMetrics,
     previousMetrics,
+    currentInputMetrics,
+    previousInputMetrics,
     regions,
     totals,
     matches: {
@@ -730,9 +772,7 @@ export function analyzeWorshipComparison(
     },
     warnings,
     excludedCount:
-      currentSheet.rows.filter((row) => !isOfficialWorship(row.worship)).length +
-      excludedPreviousCount +
-      uniqueSorted(ambiguousNames).length,
+      excludedPreviousCount + uniqueSorted(ambiguousNames).length,
   };
 }
 
