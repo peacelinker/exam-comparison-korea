@@ -12,7 +12,8 @@
     "build:sites": "npm run build && node scripts/prepare-sites.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "acceptance": "tsx scripts/acceptance.ts"
+    "acceptance": "tsx scripts/acceptance.ts",
+    "acceptance:worship": "tsx scripts/worship-acceptance.ts"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^6.0.2",

@@ -21,6 +21,7 @@ import type {
   ParsedWorkbook,
   SheetProfile,
 } from "./types";
+import WorshipFlow from "./WorshipFlow";
 
 const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
 const countUnknown = (profile: SheetProfile) =>
@@ -33,6 +34,8 @@ function App() {
   const referenceDate = getSeoulToday();
   const threshold = 0.5;
   const [parsed, setParsed] = useState<ParsedWorkbook | null>(null);
+  const [analysisType, setAnalysisType] = useState<"exam" | "worship">("exam");
+  const [uploadDate, setUploadDate] = useState(referenceDate);
   const [currentSheet, setCurrentSheet] = useState("");
   const [previousSheet, setPreviousSheet] = useState("");
   const [manualSelection, setManualSelection] = useState(false);
@@ -89,6 +92,8 @@ function App() {
         );
       }
       setParsed(workbook);
+      setUploadDate(getSeoulToday());
+      setAnalysisType("exam");
       setManualSelection(false);
       setSelectedRegion("");
     } catch (caught) {
@@ -188,6 +193,7 @@ function App() {
     setPreviousSheet("");
     setSelectedRegion("");
     setManualSelection(false);
+    setAnalysisType("exam");
     setError("");
     setToast("");
   }
@@ -202,10 +208,10 @@ function App() {
   return (
     <div className="app-shell">
       <header className="hero">
-        <h1>시험 비교 분석기</h1>
+        <h1>시험·구역예배 비교 분석기</h1>
         <p className="hero-copy">
-          엑셀 파일에서 이번 시험과 직전 시험 탭을 선택하면 지역별 증감과
-          명단을 비교해 보고서로 정리합니다.
+          한 개의 엑셀 파일에서 시험 또는 구역예배 자료를 선택해 지역별
+          증감과 명단을 비교하고 보고서로 정리합니다.
         </p>
         <p className="privacy-line">
           원본 엑셀은 수정하거나 저장하지 않으며, 선택한 파일은 현재
@@ -273,11 +279,47 @@ function App() {
           </div>
         )}
 
-        {parsed && recommendation && (
+        {parsed && (
+          <section className="workspace-card" aria-labelledby="analysis-type-title">
+            <div className="section-heading">
+              <h2 id="analysis-type-title">2. 분석 유형 선택</h2>
+            </div>
+            <div className="analysis-type-tabs" role="group" aria-label="분석 유형">
+              <button
+                type="button"
+                className={analysisType === "exam" ? "active" : ""}
+                aria-pressed={analysisType === "exam"}
+                onClick={() => {
+                  setAnalysisType("exam");
+                  setAnalysis(null);
+                  setError("");
+                }}
+              >
+                <strong>시험 비교 분석</strong>
+                <span>이번 시험과 직전 시험을 비교합니다.</span>
+              </button>
+              <button
+                type="button"
+                className={analysisType === "worship" ? "active" : ""}
+                aria-pressed={analysisType === "worship"}
+                onClick={() => {
+                  setAnalysisType("worship");
+                  setAnalysis(null);
+                  setError("");
+                }}
+              >
+                <strong>구역예배 비교 보고</strong>
+                <span>금번과 지난 구역예배 참여를 비교합니다.</span>
+              </button>
+            </div>
+          </section>
+        )}
+
+        {parsed && recommendation && analysisType === "exam" && (
           <>
             <section className="workspace-card" aria-labelledby="recommend-title">
               <div className="section-heading">
-                <h2 id="recommend-title">2. 이번·직전 시험 탭 선택</h2>
+                <h2 id="recommend-title">3. 이번·직전 시험 탭 선택</h2>
                 <button
                   type="button"
                   className="text-button"
@@ -411,14 +453,14 @@ function App() {
           </>
         )}
 
-        {analysis && (
+        {analysis && analysisType === "exam" && (
           <section
             id="report-section"
             className="workspace-card report-section"
             aria-labelledby="report-title"
           >
             <div className="section-heading">
-              <h2 id="report-title">3. 지역별 비교 보고서</h2>
+              <h2 id="report-title">4. 지역별 비교 보고서</h2>
               <div className="summary-pills">
                 <span>
                   경고 <strong>{analysis.warnings.length}</strong>
@@ -607,6 +649,19 @@ function App() {
               <p>새 파일을 선택하면 현재 메모리의 분석 결과를 초기화합니다.</p>
             </div>
           </section>
+        )}
+
+        {parsed && analysisType === "worship" && (
+          <WorshipFlow
+            parsed={parsed}
+            uploadDate={uploadDate}
+            onError={setError}
+            onToast={(message) => {
+              setToast(message);
+              window.setTimeout(() => setToast(""), 2400);
+            }}
+            onReset={resetAll}
+          />
         )}
       </main>
 

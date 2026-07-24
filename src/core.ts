@@ -44,11 +44,17 @@ export function createDataRow(
   name: unknown,
   worship: unknown,
   exam: unknown,
+  worshipParticipation: unknown = "",
 ): DataRow {
-  const display = (value: unknown) => String(value ?? "").trim();
+  const display = (value: unknown) =>
+    String(value ?? "")
+      .normalize("NFKC")
+      .trim()
+      .replace(/\s+/g, " ");
   const rawRegion = display(region);
   const rawName = display(name);
   const rawWorship = display(worship);
+  const rawWorshipParticipation = display(worshipParticipation);
   const rawExam = display(exam);
 
   return {
@@ -56,10 +62,12 @@ export function createDataRow(
     region: rawRegion,
     name: rawName,
     worship: rawWorship,
+    worshipParticipation: rawWorshipParticipation,
     exam: rawExam,
     canonicalRegion: canonicalize(rawRegion),
     canonicalName: canonicalize(rawName),
     canonicalWorship: canonicalize(rawWorship),
+    canonicalWorshipParticipation: canonicalize(rawWorshipParticipation),
     status: classifyStatus(rawExam),
   };
 }
@@ -70,6 +78,7 @@ export function calculateMetrics(
     missingRegionOrNameCount?: number;
     formulaWithoutCachedValueCount?: number;
     columnsReadable?: boolean;
+    worshipColumnsReadable?: boolean;
   } = {},
 ): SheetMetrics {
   const unknownStatusCounts: Record<string, number> = {};
@@ -98,6 +107,7 @@ export function calculateMetrics(
     formulaWithoutCachedValueCount:
       options.formulaWithoutCachedValueCount ?? 0,
     columnsReadable: options.columnsReadable ?? true,
+    worshipColumnsReadable: options.worshipColumnsReadable ?? true,
   };
 }
 

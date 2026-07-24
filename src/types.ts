@@ -9,6 +9,8 @@ export const ATTENDED_STATUSES = [
 
 export const NOT_ATTENDED_STATUS = "미응시" as const;
 
+export const WORSHIP_STATUSES = ["대면", "줌", "통화", "미참여"] as const;
+
 export const OFFICIAL_WORSHIP_VALUES = [
   "9시",
   "12시",
@@ -22,16 +24,19 @@ export const OFFICIAL_WORSHIP_VALUES = [
 export type AttendedStatus = (typeof ATTENDED_STATUSES)[number];
 export type ExamStatus = AttendedStatus | typeof NOT_ATTENDED_STATUS;
 export type StatusKind = ExamStatus | "blank" | "unknown";
+export type WorshipStatus = (typeof WORSHIP_STATUSES)[number];
 
 export interface DataRow {
   rowNumber: number;
   region: string;
   name: string;
   worship: string;
+  worshipParticipation: string;
   exam: string;
   canonicalRegion: string;
   canonicalName: string;
   canonicalWorship: string;
+  canonicalWorshipParticipation: string;
   status: StatusKind;
 }
 
@@ -45,6 +50,7 @@ export interface SheetMetrics {
   missingRegionOrNameCount: number;
   formulaWithoutCachedValueCount: number;
   columnsReadable: boolean;
+  worshipColumnsReadable: boolean;
 }
 
 export interface SheetProfile {
@@ -133,3 +139,98 @@ export interface AnalysisResult {
   warnings: string[];
   excludedCount: number;
 }
+
+export interface WorshipSheetMetrics {
+  officialCount: number;
+  validInputCount: number;
+  blankInputCount: number;
+  validInputRatio: number;
+  unknownStatusCounts: Record<string, number>;
+  duplicatePersonCount: number;
+  missingRegionCount: number;
+  columnsReadable: boolean;
+}
+
+export interface WorshipDateInfo {
+  sheetName: string;
+  isoDate: string;
+  diffDays: number;
+  isFuture: boolean;
+  isWithinRecentWeek: boolean;
+}
+
+export interface WorshipRecommendation {
+  currentSheet?: string;
+  previousSheet?: string;
+  currentReason: string;
+  previousReason: string;
+  sheetDates: Array<{ sheetName: string; date?: WorshipDateInfo }>;
+  warnings: string[];
+}
+
+export interface WorshipPerson {
+  rowNumber: number;
+  region: string;
+  name: string;
+  canonicalRegion: string;
+  canonicalName: string;
+  status: WorshipStatus;
+  rawStatus: string;
+}
+
+export interface WorshipCounts {
+  대면: number;
+  줌: number;
+  통화: number;
+  미참여: number;
+  attendedTotal: number;
+}
+
+export interface WorshipTransitionSummary {
+  attendedToAbsent: string[];
+  faceToLower: string[];
+  zoomToLower: string[];
+  callToAbsent: string[];
+  toFace: string[];
+  callToZoom: string[];
+  absentToFace: string[];
+  absentToZoom: string[];
+  absentToCall: string[];
+}
+
+export interface WorshipRegionAnalysis {
+  region: string;
+  rosterCount: number;
+  currentCounts: WorshipCounts;
+  previousCounts: WorshipCounts;
+  participationRate: number;
+  transitions: WorshipTransitionSummary;
+}
+
+export interface WorshipMatchSummary {
+  ambiguousNames: string[];
+  unmatchedCurrentNames: string[];
+  movedNames: string[];
+  excludedPreviousCount: number;
+}
+
+export interface WorshipAnalysisResult {
+  currentSheet: SheetProfile;
+  previousSheet: SheetProfile;
+  currentDate?: WorshipDateInfo;
+  previousDate?: WorshipDateInfo;
+  currentMetrics: WorshipSheetMetrics;
+  previousMetrics: WorshipSheetMetrics;
+  regions: WorshipRegionAnalysis[];
+  totals: WorshipRegionAnalysis;
+  matches: WorshipMatchSummary;
+  warnings: string[];
+  excludedCount: number;
+}
+
+export interface WorshipGoal {
+  total?: number;
+  face?: number;
+}
+
+export type WorshipGoals = Record<string, WorshipGoal>;

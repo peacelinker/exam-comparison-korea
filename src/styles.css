@@ -626,6 +626,285 @@ footer {
   border: 0;
 }
 
+.analysis-type-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.analysis-type-tabs button {
+  min-height: 84px;
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  color: #50535f;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #ffffff;
+  text-align: left;
+}
+
+.analysis-type-tabs button:hover {
+  border-color: #aeb4bf;
+  background: #fafbfc;
+}
+
+.analysis-type-tabs button.active {
+  color: #174e80;
+  border-color: #83b8e9;
+  background: var(--blue-soft);
+  box-shadow: inset 3px 0 0 var(--blue);
+}
+
+.analysis-type-tabs strong {
+  font-size: 14px;
+}
+
+.analysis-type-tabs span {
+  color: #7f8490;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.recommend-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.recommend-actions > span {
+  padding: 4px 7px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.recommend-actions .automatic {
+  color: #185f98;
+  background: var(--blue-soft);
+}
+
+.recommend-actions .manual {
+  color: #6a5319;
+  background: #fff3cf;
+}
+
+.worship-date-row {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(280px, 1fr);
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+input[type="date"],
+input[type="number"] {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 12px;
+  color: var(--ink);
+  border: 1px solid #d5d9e1;
+  border-radius: 7px;
+  outline: none;
+  background: #ffffff;
+}
+
+input[type="date"]:focus,
+input[type="number"]:focus,
+input[type="range"]:focus-visible {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(0, 104, 201, 0.12);
+}
+
+.advanced-settings {
+  align-self: start;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fafbfc;
+}
+
+.advanced-settings summary {
+  cursor: pointer;
+  color: #555965;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.advanced-settings label {
+  margin-top: 12px;
+}
+
+.threshold-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.threshold-control input {
+  flex: 1;
+}
+
+.threshold-control output {
+  min-width: 46px;
+  color: var(--blue-dark);
+  font-size: 12px;
+  font-weight: 750;
+  text-align: right;
+}
+
+.worship-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 16px 0 22px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.worship-summary-grid > div {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  padding: 15px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.worship-summary-grid > div:nth-child(4n) {
+  border-right: 0;
+}
+
+.worship-summary-grid > div:nth-last-child(-n + 4) {
+  border-bottom: 0;
+}
+
+.worship-summary-grid span,
+.selection-audit span {
+  color: #858995;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.worship-summary-grid strong {
+  color: #343640;
+  font-size: 20px;
+  font-weight: 750;
+}
+
+.worship-summary-grid .positive {
+  color: var(--green);
+  font-size: 14px;
+}
+
+.worship-summary-grid .negative {
+  color: var(--danger);
+  font-size: 14px;
+}
+
+.selection-audit {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 14px;
+  border-left: 3px solid #a9b8c8;
+  background: #f7f8fa;
+}
+
+.selection-audit > div {
+  display: grid;
+  gap: 4px;
+}
+
+.selection-audit strong {
+  font-size: 13px;
+}
+
+.selection-audit small {
+  color: #858995;
+  font-size: 10px;
+}
+
+.selection-audit > p {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  color: #69707d;
+  font-size: 11px;
+}
+
+.subsection-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 26px 0 10px;
+}
+
+.subsection-heading h3 {
+  margin: 0;
+  color: #363842;
+  font-size: 15px;
+}
+
+.subsection-heading p {
+  margin: 4px 0 0;
+  color: #858995;
+  font-size: 10px;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.data-table {
+  width: 100%;
+  min-width: 650px;
+  border-collapse: collapse;
+  font-size: 11px;
+  text-align: right;
+}
+
+.data-table th,
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eceef2;
+}
+
+.data-table thead th {
+  color: #686d78;
+  background: #f5f6f8;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.data-table th:first-child,
+.data-table td:first-child {
+  text-align: left;
+}
+
+.data-table tbody tr:last-child th,
+.data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.data-table tbody tr:hover {
+  background: #fbfcfd;
+}
+
+.goal-table {
+  min-width: 520px;
+}
+
+.goal-table input {
+  max-width: 160px;
+  min-height: 36px;
+  margin-left: auto;
+  text-align: right;
+}
+
 @media (max-width: 900px) {
   .report-meta-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -660,6 +939,24 @@ footer {
   .toolbar-actions {
     justify-content: flex-start;
   }
+
+  .worship-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .worship-summary-grid > div,
+  .worship-summary-grid > div:nth-child(4n) {
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .worship-summary-grid > div:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .worship-summary-grid > div:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
 }
 
 @media (max-width: 640px) {
@@ -685,6 +982,11 @@ footer {
     flex-direction: column;
   }
 
+  .recommend-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .file-chip {
     max-width: 100%;
   }
@@ -700,8 +1002,15 @@ footer {
 
   .select-grid,
   .report-meta-grid,
-  .name-list-grid {
+  .name-list-grid,
+  .analysis-type-tabs,
+  .worship-date-row,
+  .selection-audit {
     grid-template-columns: 1fr;
+  }
+
+  .selection-audit > p {
+    grid-column: 1;
   }
 
   .report-meta-grid > div {
