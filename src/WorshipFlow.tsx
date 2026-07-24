@@ -186,23 +186,6 @@ function WorshipFlow({
     }
   }
 
-  function setGoal(
-    region: string,
-    field: "total" | "face",
-    value: string,
-  ) {
-    setGoals((existing) => ({
-      ...existing,
-      [region]: {
-        ...existing[region],
-        [field]:
-          value === ""
-            ? undefined
-            : Math.max(0, Math.floor(Number(value) || 0)),
-      },
-    }));
-  }
-
   const analyzeDisabled =
     !currentSheet ||
     !previousSheet ||
@@ -437,57 +420,6 @@ function WorshipFlow({
                 ? "사용자가 직접 선택한 탭으로 분석했습니다."
                 : recommendation.currentReason}
             </p>
-          </div>
-
-          <div className="subsection-heading">
-            <div>
-              <h3>지역별 목표</h3>
-              <p>입력하지 않은 목표는 보고서에 ‘미설정’으로 표시됩니다.</p>
-            </div>
-          </div>
-          <div className="table-scroll">
-            <table className="data-table goal-table">
-              <thead>
-                <tr>
-                  <th scope="col">지역</th>
-                  <th scope="col">전체 참여 목표</th>
-                  <th scope="col">대면 참여 목표</th>
-                </tr>
-              </thead>
-              <tbody>
-                {analysis.regions.map((region) => (
-                  <tr key={region.region}>
-                    <th scope="row">{region.region}</th>
-                    <td>
-                      <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        inputMode="numeric"
-                        aria-label={`${region.region} 전체 참여 목표`}
-                        value={goals[region.region]?.total ?? ""}
-                        onChange={(event) =>
-                          setGoal(region.region, "total", event.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        inputMode="numeric"
-                        aria-label={`${region.region} 대면 참여 목표`}
-                        value={goals[region.region]?.face ?? ""}
-                        onChange={(event) =>
-                          setGoal(region.region, "face", event.target.value)
-                        }
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
 
           <div className="subsection-heading">
