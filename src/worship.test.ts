@@ -357,14 +357,14 @@ describe("사람 연결과 집계", () => {
 });
 
 describe("보고서와 통합 회귀", () => {
-  it("26. 목표 미설정과 지정된 보고서 문구를 출력한다", () => {
+  it("26. 목표 문구 없이 비교 보고서를 출력한다", () => {
     const result = analysisFor(
       [worshipRow("서대문", "가람", "대면")],
       [worshipRow("서대문", "가람", "줌")],
     );
     const report = buildWorshipRegionReport(result.regions[0]);
     expect(report).toContain("• 서대문지역 (출결재적 1명)");
-    expect(report).toContain("목표 : 미설정");
+    expect(report).not.toContain("목표");
     expect(report).toContain("지난 구역예배 대비");
     expect(report).toContain("2. 증감추이 분석");
     expect(report).toContain("- 없음");
@@ -381,12 +381,11 @@ describe("보고서와 통합 회귀", () => {
         worshipRow("서대문", "나래", "미참여"),
       ],
     );
-    const report = buildFullWorshipReport(result, {
-      서대문: { total: 2, face: 1 },
-    });
+    const report = buildFullWorshipReport(result);
     expect(report.indexOf("서대문지역")).toBeLessThan(report.indexOf("홍대지역"));
-    expect(report).toContain("목표 : 2명");
-    const csv = buildWorshipCsv(result, {});
+    expect(report).not.toContain("목표");
+    const csv = buildWorshipCsv(result);
+    expect(csv).not.toContain("목표");
     expect(csv.split("\r\n")[1]).toContain("전체 지역");
   });
 
