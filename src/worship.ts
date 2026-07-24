@@ -535,21 +535,25 @@ export function sortWorshipRegions(regions: string[]): string[] {
 
 function buildRegionAnalysis(
   region: string,
+  currentPeople: WorshipPerson[],
+  previousPeople: WorshipPerson[],
   pairs: WorshipPair[],
 ): WorshipRegionAnalysis {
   const currentCounts = countWorshipStatuses(
-    pairs.map((pair) => pair.current.status),
+    currentPeople.map((person) => person.status),
   );
   const previousCounts = countWorshipStatuses(
-    pairs.map((pair) => pair.previousStatus),
+    previousPeople.map((person) => person.status),
   );
   return {
     region,
-    rosterCount: pairs.length,
+    rosterCount: currentPeople.length,
     currentCounts,
     previousCounts,
     participationRate:
-      pairs.length === 0 ? 0 : currentCounts.attendedTotal / pairs.length,
+      currentPeople.length === 0
+        ? 0
+        : currentCounts.attendedTotal / currentPeople.length,
     transitions: calculateWorshipTransitions(pairs),
   };
 }
@@ -680,17 +684,31 @@ export function analyzeWorshipComparison(
   }
 
   const regionNames = sortWorshipRegions(
-    currentPrepared.people.map((person) => person.region),
-  );
-  const regions = regionNames.map((region) =>
-    buildRegionAnalysis(
-      region,
-      pairs.filter(
-        (pair) => pair.current.canonicalRegion === canonicalize(region),
-      ),
+    [...currentPrepared.people, ...previousPrepared.people].map(
+      (person) => person.region,
     ),
   );
-  const totals = buildRegionAnalysis("전체 지역", pairs);
+  const regions = regionNames.map((region) => {
+    const canonicalRegion = canonicalize(region);
+    return buildRegionAnalysis(
+      region,
+      currentPrepared.people.filter(
+        (person) => person.canonicalRegion === canonicalRegion,
+      ),
+      previousPrepared.people.filter(
+        (person) => person.canonicalRegion === canonicalRegion,
+      ),
+      pairs.filter(
+        (pair) => pair.current.canonicalRegion === canonicalRegion,
+      ),
+    );
+  });
+  const totals = buildRegionAnalysis(
+    "전체 지역",
+    currentPrepared.people,
+    previousPrepared.people,
+    pairs,
+  );
   const excludedPreviousCount = previousPrepared.people.filter(
     (person) =>
       !usedPrevious.has(
