@@ -253,24 +253,27 @@ describe("사람 연결과 집계", () => {
     expect(result.totals.transitions.absentToFace).toEqual(["가람"]);
   });
 
-  it("19. 전체 참여와 참여율을 현재 출결재적 기준으로 계산한다", () => {
+  it("19. G열 값과 무관하게 H열 전체 명단을 실제 셀 기준으로 집계한다", () => {
     const result = analysisFor(
       [
         worshipRow("서대문", "가람", "대면"),
         worshipRow("서대문", "나래", "줌"),
         worshipRow("서대문", "다온", "통화"),
         worshipRow("서대문", "라온", "미참여"),
+        worshipRow("서대문", "마루", "대면", "기타예배"),
       ],
       [
         worshipRow("서대문", "가람", "대면"),
         worshipRow("서대문", "나래", "미참여"),
         worshipRow("서대문", "다온", "미참여"),
         worshipRow("서대문", "라온", "미참여"),
+        worshipRow("서대문", "마루", "줌", "기타예배"),
       ],
     );
-    expect(result.totals.rosterCount).toBe(4);
-    expect(result.totals.currentCounts.attendedTotal).toBe(3);
-    expect(result.totals.participationRate).toBe(0.75);
+    expect(result.totals.rosterCount).toBe(5);
+    expect(result.totals.currentCounts.대면).toBe(2);
+    expect(result.totals.currentCounts.attendedTotal).toBe(4);
+    expect(result.totals.participationRate).toBe(0.8);
   });
 
   it("20. 증가·하락·변동 없음 문구를 만든다", () => {
@@ -346,7 +349,7 @@ describe("사람 연결과 집계", () => {
         "0713",
         "2026-07-23",
       ),
-    ).toThrow("정식예배자");
+    ).toThrow("분석 대상");
     expect(() =>
       analysisFor(
         [worshipRow("서대문", "가람", "")],
@@ -363,7 +366,7 @@ describe("보고서와 통합 회귀", () => {
       [worshipRow("서대문", "가람", "줌")],
     );
     const report = buildWorshipRegionReport(result.regions[0]);
-    expect(report).toContain("• 서대문지역 (출결재적 1명)");
+    expect(report).toContain("• 서대문지역 (분석 인원 1명)");
     expect(report).not.toContain("목표");
     expect(report).toContain("지난 구역예배 대비");
     expect(report).toContain("2. 증감추이 분석");
