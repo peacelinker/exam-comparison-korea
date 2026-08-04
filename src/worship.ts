@@ -13,7 +13,11 @@ import {
   type WorshipStatus,
   type WorshipTransitionSummary,
 } from "./types";
-import { canonicalize, isOfficialWorship } from "./core";
+import {
+  canonicalize,
+  formatPersonDetail,
+  isOfficialWorship,
+} from "./core";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const REGION_ORDER = [
@@ -97,6 +101,8 @@ function chooseRows(
     const next: WorshipPerson = {
       rowNumber: row.rowNumber,
       region,
+      team: displayText(row.team),
+      district: displayText(row.district),
       name: displayText(row.name),
       canonicalRegion: canonicalize(region),
       canonicalName: row.canonicalName,
@@ -470,7 +476,7 @@ function calculateWorshipTransitions(
   for (const pair of pairs) {
     const previous = pair.previousStatus;
     const current = pair.current.status;
-    const name = pair.current.name;
+    const name = formatPersonDetail(pair.current);
     if (
       (previous === "대면" || previous === "줌" || previous === "통화") &&
       current === "미참여"

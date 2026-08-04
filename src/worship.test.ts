@@ -31,6 +31,8 @@ function worshipRow(
   participation: string,
   worship = "9시",
   rowNumber = 2,
+  team = "",
+  district = "",
 ): DataRow {
   return createDataRow(
     rowNumber,
@@ -39,7 +41,18 @@ function worshipRow(
     worship,
     "",
     participation,
+    team,
+    district,
   );
+}
+
+function detail(
+  name: string,
+  region = "서대문",
+  team = "",
+  district = "",
+): string {
+  return `${name} (지역: ${region || "미입력"} · 팀: ${team || "미입력"} · 구역: ${district || "미입력"})`;
 }
 
 function sheet(name: string, rows: DataRow[]) {
@@ -251,7 +264,7 @@ describe("사람 연결과 집계", () => {
     );
     expect(result.matches.unmatchedCurrentNames).toEqual(["가람"]);
     expect(result.totals.previousCounts.줌).toBe(1);
-    expect(result.totals.transitions.absentToFace).toEqual(["가람"]);
+    expect(result.totals.transitions.absentToFace).toEqual([detail("가람")]);
   });
 
   it("19. 과거 지역 현황은 현재 명단 매칭과 무관하게 과거 탭의 지역·H열로 집계한다", () => {
@@ -308,7 +321,9 @@ describe("사람 연결과 집계", () => {
       [worshipRow("서대문", "가람", "미참여")],
       [worshipRow("서대문", "가람", "대면")],
     );
-    expect(result.totals.transitions.attendedToAbsent).toEqual(["가람"]);
+    expect(result.totals.transitions.attendedToAbsent).toEqual([
+      detail("가람"),
+    ]);
   });
 
   it("22. 단계하락 세부 유형을 중복 없이 계산한다", () => {
@@ -324,9 +339,9 @@ describe("사람 연결과 집계", () => {
         worshipRow("서대문", "다온", "통화"),
       ],
     );
-    expect(result.totals.transitions.faceToLower).toEqual(["가람"]);
-    expect(result.totals.transitions.zoomToLower).toEqual(["나래"]);
-    expect(result.totals.transitions.callToAbsent).toEqual(["다온"]);
+    expect(result.totals.transitions.faceToLower).toEqual([detail("가람")]);
+    expect(result.totals.transitions.zoomToLower).toEqual([detail("나래")]);
+    expect(result.totals.transitions.callToAbsent).toEqual([detail("다온")]);
   });
 
   it("23. 단계향상 유형을 계산한다", () => {
@@ -340,8 +355,8 @@ describe("사람 연결과 집계", () => {
         worshipRow("서대문", "나래", "통화"),
       ],
     );
-    expect(result.totals.transitions.toFace).toEqual(["가람"]);
-    expect(result.totals.transitions.callToZoom).toEqual(["나래"]);
+    expect(result.totals.transitions.toFace).toEqual([detail("가람")]);
+    expect(result.totals.transitions.callToZoom).toEqual([detail("나래")]);
   });
 
   it("24. 미참여에서 대면·줌·통화로 바뀐 유형을 계산한다", () => {
@@ -357,9 +372,9 @@ describe("사람 연결과 집계", () => {
         worshipRow("서대문", "다온", "미참여"),
       ],
     );
-    expect(result.totals.transitions.absentToFace).toEqual(["가람"]);
-    expect(result.totals.transitions.absentToZoom).toEqual(["나래"]);
-    expect(result.totals.transitions.absentToCall).toEqual(["다온"]);
+    expect(result.totals.transitions.absentToFace).toEqual([detail("가람")]);
+    expect(result.totals.transitions.absentToZoom).toEqual([detail("나래")]);
+    expect(result.totals.transitions.absentToCall).toEqual([detail("다온")]);
   });
 
   it("25. 출결재적 0명과 H열 전체 빈값을 안전하게 차단한다", () => {
@@ -416,8 +431,8 @@ describe("보고서와 통합 회귀", () => {
   it("28. 개인정보 없는 XLSX fixture를 업로드 구조로 파싱한다", () => {
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.aoa_to_sheet([
-      ["지역", "", "", "이름", "", "", "예배 현황", "구역예배", "시험"],
-      ["서대문", "", "", "가람", "", "", "9시", "대면모임", "정규응시"],
+      ["지역", "팀", "구역", "이름", "", "", "예배 현황", "구역예배", "시험"],
+      ["서대문", "청년1팀", "믿음구역", "가람", "", "", "9시", "대면모임", "정규응시"],
     ]);
     XLSX.utils.book_append_sheet(workbook, worksheet, "0719");
     const bytes = XLSX.write(workbook, {
@@ -426,6 +441,8 @@ describe("보고서와 통합 회귀", () => {
     }) as ArrayBuffer;
     const parsed = parseWorkbookBuffer(bytes, "fixture.xlsx");
     expect(parsed.sheets[0].rows[0].worshipParticipation).toBe("대면모임");
+    expect(parsed.sheets[0].rows[0].team).toBe("청년1팀");
+    expect(parsed.sheets[0].rows[0].district).toBe("믿음구역");
     expect(parsed.sheets[0].metrics.worshipColumnsReadable).toBe(true);
   });
 

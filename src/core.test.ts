@@ -8,6 +8,7 @@ import {
   createDataRow,
   createSheetProfile,
   formatDelta,
+  formatPersonDetail,
   interpretTabDate,
   isOfficialWorship,
   matchPeople,
@@ -24,8 +25,19 @@ function row(
   exam: string,
   worship = "9시",
   rowNumber = 2,
+  team = "",
+  district = "",
 ): DataRow {
-  return createDataRow(rowNumber, region, name, worship, exam);
+  return createDataRow(
+    rowNumber,
+    region,
+    name,
+    worship,
+    exam,
+    "",
+    team,
+    district,
+  );
 }
 
 function sheet(name: string, rows: DataRow[]) {
@@ -174,7 +186,9 @@ describe("집계와 사람 매칭", () => {
       [row("가", "가람", "서면응시")],
     );
     const transitions = calculateTransitions(matches.pairs);
-    expect(transitions.fromAttendedToNot.서면응시).toEqual(["가람"]);
+    expect(transitions.fromAttendedToNot.서면응시).toEqual([
+      "가람 (지역: 가 · 팀: 미입력 · 구역: 미입력)",
+    ]);
   });
 
   it("14. 미응시에서 응시로 바뀐 사람을 이번 상태별로 센다", () => {
@@ -183,7 +197,9 @@ describe("집계와 사람 매칭", () => {
       [row("가", "나래", "미응시")],
     );
     const transitions = calculateTransitions(matches.pairs);
-    expect(transitions.fromNotToAttended.비공식응시).toEqual(["나래"]);
+    expect(transitions.fromNotToAttended.비공식응시).toEqual([
+      "나래 (지역: 가 · 팀: 미입력 · 구역: 미입력)",
+    ]);
   });
 
   it("15. 빈값과 알 수 없는 값은 미응시로 바꾸지 않는다", () => {
@@ -301,5 +317,23 @@ describe("집계와 사람 매칭", () => {
     expect(
       result.currentTotals.regularGroup - result.previousTotals.regularGroup,
     ).toBe(1);
+  });
+
+  it("22. 상세 명단에 이름과 A·B·C열 소속을 함께 표시한다", () => {
+    const person = row(
+      "서대문",
+      "가람",
+      "정규응시",
+      "9시",
+      2,
+      "청년1팀",
+      "믿음구역",
+    );
+    expect(formatPersonDetail(person)).toBe(
+      "가람 (지역: 서대문 · 팀: 청년1팀 · 구역: 믿음구역)",
+    );
+    expect(
+      formatPersonDetail(row("서대문", "나래", "정규응시")),
+    ).toBe("나래 (지역: 서대문 · 팀: 미입력 · 구역: 미입력)");
   });
 });

@@ -2,7 +2,7 @@ import * as XLSX from "xlsx";
 import { createDataRow, createSheetProfile } from "./core";
 import type { ParsedWorkbook, SheetProfile } from "./types";
 
-const RELEVANT_COLUMNS = [0, 3, 6, 7, 8] as const;
+const RELEVANT_COLUMNS = [0, 1, 2, 3, 6, 7, 8] as const;
 
 function getCell(
   sheet: XLSX.WorkSheet,
@@ -61,7 +61,15 @@ function parseSheet(name: string, sheet: XLSX.WorkSheet): SheetProfile {
       }
 
       const values = cells.map(visibleValue);
-      const [region, personName, worship, worshipParticipation, exam] = values;
+      const [
+        region,
+        team,
+        district,
+        personName,
+        worship,
+        worshipParticipation,
+        exam,
+      ] = values;
       const anyRelevantValue = values.some(
         (value) => String(value ?? "").trim() !== "",
       );
@@ -79,6 +87,8 @@ function parseSheet(name: string, sheet: XLSX.WorkSheet): SheetProfile {
           worship,
           exam,
           worshipParticipation,
+          team,
+          district,
         ),
       );
     }

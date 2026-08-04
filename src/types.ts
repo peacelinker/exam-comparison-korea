@@ -29,6 +29,8 @@ export type WorshipStatus = (typeof WORSHIP_STATUSES)[number];
 export interface DataRow {
   rowNumber: number;
   region: string;
+  team: string;
+  district: string;
   name: string;
   worship: string;
   worshipParticipation: string;
@@ -181,6 +183,8 @@ export interface WorshipRecommendation {
 export interface WorshipPerson {
   rowNumber: number;
   region: string;
+  team: string;
+  district: string;
   name: string;
   canonicalRegion: string;
   canonicalName: string;

@@ -69,6 +69,8 @@ export function createDataRow(
   worship: unknown,
   exam: unknown,
   worshipParticipation: unknown = "",
+  team: unknown = "",
+  district: unknown = "",
 ): DataRow {
   const display = (value: unknown) =>
     String(value ?? "")
@@ -76,6 +78,8 @@ export function createDataRow(
       .trim()
       .replace(/\s+/g, " ");
   const rawRegion = display(region);
+  const rawTeam = display(team);
+  const rawDistrict = display(district);
   const rawName = display(name);
   const rawWorship = display(worship);
   const rawWorshipParticipation = display(worshipParticipation);
@@ -84,6 +88,8 @@ export function createDataRow(
   return {
     rowNumber,
     region: rawRegion,
+    team: rawTeam,
+    district: rawDistrict,
     name: rawName,
     worship: rawWorship,
     worshipParticipation: rawWorshipParticipation,
@@ -94,6 +100,13 @@ export function createDataRow(
     canonicalWorshipParticipation: canonicalize(rawWorshipParticipation),
     status: classifyStatus(rawExam),
   };
+}
+
+export function formatPersonDetail(
+  person: Pick<DataRow, "name" | "region" | "team" | "district">,
+): string {
+  const valueOrMissing = (value: string) => value || "미입력";
+  return `${valueOrMissing(person.name)} (지역: ${valueOrMissing(person.region)} · 팀: ${valueOrMissing(person.team)} · 구역: ${valueOrMissing(person.district)})`;
 }
 
 export function calculateMetrics(
@@ -591,7 +604,7 @@ export function calculateTransitions(
     const current = pair.current.status;
     if (attendedSet.has(previous) && current === NOT_ATTENDED_STATUS) {
       transitions.fromAttendedToNot[previous as AttendedStatus].push(
-        pair.current.name,
+        formatPersonDetail(pair.current),
       );
     }
     if (
@@ -599,7 +612,7 @@ export function calculateTransitions(
       attendedSet.has(current)
     ) {
       transitions.fromNotToAttended[current as AttendedStatus].push(
-        pair.current.name,
+        formatPersonDetail(pair.current),
       );
     }
   }
@@ -620,6 +633,8 @@ function relevantRowsEqual(a: DataRow[], b: DataRow[]): boolean {
   const signature = (row: DataRow) =>
     [
       row.canonicalRegion,
+      canonicalize(row.team),
+      canonicalize(row.district),
       row.canonicalName,
       row.canonicalWorship,
       canonicalize(row.exam),
@@ -693,7 +708,7 @@ export function analyzeComparison(
             row.status === NOT_ATTENDED_STATUS &&
             officialWorshipSet.has(row.canonicalWorship),
         )
-        .map((row) => row.name),
+        .map(formatPersonDetail),
     );
     return {
       region,
