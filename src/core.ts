@@ -106,7 +106,7 @@ export function formatPersonDetail(
   person: Pick<DataRow, "name" | "region" | "team" | "district">,
 ): string {
   const valueOrMissing = (value: string) => value || "미입력";
-  return `${valueOrMissing(person.name)} (지역: ${valueOrMissing(person.region)} · 팀: ${valueOrMissing(person.team)} · 구역: ${valueOrMissing(person.district)})`;
+  return `${valueOrMissing(person.region)} ${valueOrMissing(person.team)} ${valueOrMissing(person.district)} ${valueOrMissing(person.name)}`;
 }
 
 export function calculateMetrics(

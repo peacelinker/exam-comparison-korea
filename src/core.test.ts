@@ -187,7 +187,7 @@ describe("집계와 사람 매칭", () => {
     );
     const transitions = calculateTransitions(matches.pairs);
     expect(transitions.fromAttendedToNot.서면응시).toEqual([
-      "가람 (지역: 가 · 팀: 미입력 · 구역: 미입력)",
+      "가 미입력 미입력 가람",
     ]);
   });
 
@@ -198,7 +198,7 @@ describe("집계와 사람 매칭", () => {
     );
     const transitions = calculateTransitions(matches.pairs);
     expect(transitions.fromNotToAttended.비공식응시).toEqual([
-      "나래 (지역: 가 · 팀: 미입력 · 구역: 미입력)",
+      "가 미입력 미입력 나래",
     ]);
   });
 
@@ -330,10 +330,10 @@ describe("집계와 사람 매칭", () => {
       "믿음구역",
     );
     expect(formatPersonDetail(person)).toBe(
-      "가람 (지역: 서대문 · 팀: 청년1팀 · 구역: 믿음구역)",
+      "서대문 청년1팀 믿음구역 가람",
     );
     expect(
       formatPersonDetail(row("서대문", "나래", "정규응시")),
-    ).toBe("나래 (지역: 서대문 · 팀: 미입력 · 구역: 미입력)");
+    ).toBe("서대문 미입력 미입력 나래");
   });
 });

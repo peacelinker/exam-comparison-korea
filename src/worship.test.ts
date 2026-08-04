@@ -52,7 +52,7 @@ function detail(
   team = "",
   district = "",
 ): string {
-  return `${name} (지역: ${region || "미입력"} · 팀: ${team || "미입력"} · 구역: ${district || "미입력"})`;
+  return `${region || "미입력"} ${team || "미입력"} ${district || "미입력"} ${name}`;
 }
 
 function sheet(name: string, rows: DataRow[]) {
