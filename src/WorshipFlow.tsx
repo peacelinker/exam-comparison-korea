@@ -11,7 +11,6 @@ import type {
 import {
   analyzeWorshipComparison,
   calculateWorshipSheetMetrics,
-  formatParticipationRate,
   formatWorshipDelta,
   recommendWorshipSheets,
 } from "./worship";
@@ -349,16 +348,25 @@ function WorshipFlow({
               primaryValue: `${region.currentCounts.attendedTotal.toLocaleString()}명`,
               metrics: [
                 {
-                  label: "분석 인원",
-                  value: `${region.rosterCount.toLocaleString()}명`,
+                  label: "대면 모임",
+                  value: `${region.currentCounts.대면.toLocaleString()}명`,
                 },
                 {
-                  label: "참여율",
-                  value: `${formatParticipationRate(region.participationRate)}%`,
-                },
-                {
-                  label: "지난 참여",
+                  label: "지난 구역예배",
                   value: `${region.previousCounts.attendedTotal.toLocaleString()}명`,
+                },
+                {
+                  label: "전체 참여 증감",
+                  value: formatWorshipDelta(
+                    region.currentCounts.attendedTotal -
+                      region.previousCounts.attendedTotal,
+                  ),
+                },
+                {
+                  label: "대면 모임 증감",
+                  value: formatWorshipDelta(
+                    region.currentCounts.대면 - region.previousCounts.대면,
+                  ),
                 },
               ],
             }))}
@@ -373,8 +381,22 @@ function WorshipFlow({
                 value: `${analysis.totals.currentCounts.대면.toLocaleString()}명`,
               },
               {
-                label: "참여율",
-                value: `${formatParticipationRate(analysis.totals.participationRate)}%`,
+                label: "지난 구역예배",
+                value: `${analysis.totals.previousCounts.attendedTotal.toLocaleString()}명`,
+              },
+              {
+                label: "전체 참여 증감",
+                value: formatWorshipDelta(
+                  analysis.totals.currentCounts.attendedTotal -
+                    analysis.totals.previousCounts.attendedTotal,
+                ),
+              },
+              {
+                label: "대면 모임 증감",
+                value: formatWorshipDelta(
+                  analysis.totals.currentCounts.대면 -
+                    analysis.totals.previousCounts.대면,
+                ),
               },
             ]}
             keyStats={[
@@ -387,10 +409,17 @@ function WorshipFlow({
                 value: `${analysis.totals.currentCounts.대면.toLocaleString()}명`,
               },
               {
-                label: "지난 구역예배 대비",
+                label: "전체 참여 증감",
                 value: formatWorshipDelta(
                   analysis.totals.currentCounts.attendedTotal -
                     analysis.totals.previousCounts.attendedTotal,
+                ),
+              },
+              {
+                label: "대면 모임 증감",
+                value: formatWorshipDelta(
+                  analysis.totals.currentCounts.대면 -
+                    analysis.totals.previousCounts.대면,
                 ),
               },
             ]}
