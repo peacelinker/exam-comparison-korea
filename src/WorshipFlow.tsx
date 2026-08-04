@@ -394,6 +394,7 @@ function WorshipFlow({
                 ),
               },
             ]}
+            totalFirst
           />
 
           <div className="selection-audit">
