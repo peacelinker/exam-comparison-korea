@@ -13,6 +13,7 @@ import {
   matchPeople,
   parseDateTabName,
   recommendSheets,
+  sortExamRegions,
 } from "./core";
 import { buildRegionReport } from "./report";
 import { ATTENDED_STATUSES, type DataRow } from "./types";
@@ -240,5 +241,31 @@ describe("집계와 사람 매칭", () => {
     expect(formatDelta(4)).toBe("4명 증가");
     expect(formatDelta(-3)).toBe("3명 감소");
     expect(formatDelta(0)).toBe("변동 없음");
+  });
+
+  it("20. 시험 지역을 지정 순서로 정렬하고 새 지역은 뒤에 가나다순으로 둔다", () => {
+    expect(
+      sortExamRegions([
+        "강북",
+        "소성",
+        "마포",
+        "합정",
+        "새신",
+        "서대문",
+        "홍대",
+        "신촌",
+        "강남",
+      ]),
+    ).toEqual([
+      "서대문",
+      "마포",
+      "합정",
+      "신촌",
+      "새신",
+      "홍대",
+      "소성",
+      "강남",
+      "강북",
+    ]);
   });
 });

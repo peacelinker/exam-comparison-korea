@@ -19,6 +19,7 @@ interface ReportSnapshotProps {
   totalCaption: string;
   totalMetrics: SnapshotMetric[];
   keyStats: SnapshotMetric[];
+  totalFirst?: boolean;
 }
 
 function MetricGrid({
@@ -48,7 +49,19 @@ function ReportSnapshot({
   totalCaption,
   totalMetrics,
   keyStats,
+  totalFirst = false,
 }: ReportSnapshotProps) {
+  const totalCard = (
+    <article className="snapshot-total-card">
+      <div className="snapshot-card-title">
+        <span aria-hidden="true" />
+        <h4>전체</h4>
+      </div>
+      <p className="snapshot-caption">{totalCaption}</p>
+      <MetricGrid metrics={totalMetrics} />
+    </article>
+  );
+
   return (
     <section className="report-snapshot" aria-label={title}>
       <header className="snapshot-header">
@@ -58,6 +71,8 @@ function ReportSnapshot({
         </div>
         <span className="snapshot-date">{dateLabel}</span>
       </header>
+
+      {totalFirst && totalCard}
 
       <div className="snapshot-card-grid">
         {cards.map((card) => (
@@ -76,14 +91,7 @@ function ReportSnapshot({
         ))}
       </div>
 
-      <article className="snapshot-total-card">
-        <div className="snapshot-card-title">
-          <span aria-hidden="true" />
-          <h4>전체</h4>
-        </div>
-        <p className="snapshot-caption">{totalCaption}</p>
-        <MetricGrid metrics={totalMetrics} />
-      </article>
+      {!totalFirst && totalCard}
 
       <section className="snapshot-key-panel" aria-label="핵심 현황">
         <h4>

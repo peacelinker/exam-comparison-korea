@@ -18,6 +18,15 @@ import {
 } from "./types";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const EXAM_REGION_ORDER = [
+  "서대문",
+  "마포",
+  "합정",
+  "신촌",
+  "새신",
+  "홍대",
+  "소성",
+] as const;
 const attendedSet = new Set<string>(ATTENDED_STATUSES);
 const officialWorshipSet = new Set<string>(
   OFFICIAL_WORSHIP_VALUES.map((value) => canonicalize(value)),
@@ -28,6 +37,21 @@ export function canonicalize(value: unknown): string {
     .normalize("NFKC")
     .trim()
     .replace(/\s+/g, "");
+}
+
+export function sortExamRegions(regions: string[]): string[] {
+  const order = new Map(
+    EXAM_REGION_ORDER.map((region, index) => [canonicalize(region), index]),
+  );
+
+  return [...new Set(regions)].sort((a, b) => {
+    const aIndex = order.get(canonicalize(a));
+    const bIndex = order.get(canonicalize(b));
+    if (aIndex != null && bIndex != null) return aIndex - bIndex;
+    if (aIndex != null) return -1;
+    if (bIndex != null) return 1;
+    return a.localeCompare(b, "ko", { sensitivity: "base" });
+  });
 }
 
 export function classifyStatus(value: unknown): StatusKind {
@@ -653,9 +677,7 @@ export function analyzeComparison(
       currentRegions.set(row.canonicalRegion, row.region);
     }
   }
-  const regionNames = [...currentRegions.values()].sort((a, b) =>
-    a.localeCompare(b, "ko", { sensitivity: "base" }),
-  );
+  const regionNames = sortExamRegions([...currentRegions.values()]);
   const regions: RegionAnalysis[] = regionNames.map((region) => {
     const regionKey = canonicalize(region);
     const currentRows = currentSheet.rows.filter(

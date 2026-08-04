@@ -487,7 +487,7 @@ function App() {
                 primaryValue: `${region.currentCounts.attendedTotal.toLocaleString()}명`,
                 metrics: [
                   {
-                    label: "정규군",
+                    label: "정규시험",
                     value: `${region.currentCounts.regularGroup.toLocaleString()}명`,
                   },
                   {
@@ -510,7 +510,7 @@ function App() {
                   value: `${analysis.currentTotals.attendedTotal.toLocaleString()}명`,
                 },
                 {
-                  label: "정규군",
+                  label: "정규시험",
                   value: `${analysis.currentTotals.regularGroup.toLocaleString()}명`,
                 },
                 {
@@ -524,7 +524,7 @@ function App() {
                   value: `${analysis.currentTotals.attendedTotal.toLocaleString()}명`,
                 },
                 {
-                  label: "정규군",
+                  label: "정규시험",
                   value: `${analysis.currentTotals.regularGroup.toLocaleString()}명`,
                 },
                 {
@@ -535,6 +535,7 @@ function App() {
                   ),
                 },
               ]}
+              totalFirst
             />
 
             {analysis.warnings.length > 0 && (
