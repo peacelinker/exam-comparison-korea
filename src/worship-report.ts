@@ -8,7 +8,8 @@ import {
 } from "./worship";
 
 function namesLine(names: string[]): string {
-  return `- ${names.length > 0 ? names.join(", ") : "없음"}`;
+  if (names.length === 0) return "- 없음";
+  return names.map((name) => `- ${name}`).join("\n");
 }
 
 function regionLabel(region: string): string {

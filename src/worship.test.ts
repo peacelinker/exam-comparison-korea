@@ -470,4 +470,22 @@ describe("보고서와 통합 회귀", () => {
     expect(result.currentSheet).toBe("0719");
     expect(result.previousSheet).toBe("0713");
   });
+
+  it("30. 구역예배 상세 명단을 한 줄에 한 명씩 출력한다", () => {
+    const result = analysisFor(
+      [
+        worshipRow("서대문", "가람", "대면", "9시", 2, "1팀", "3구역"),
+        worshipRow("서대문", "나래", "대면", "9시", 3, "2팀", "1구역"),
+      ],
+      [
+        worshipRow("서대문", "가람", "줌", "9시", 2, "1팀", "3구역"),
+        worshipRow("서대문", "나래", "줌", "9시", 3, "2팀", "1구역"),
+      ],
+    );
+    const report = buildWorshipRegionReport(result.regions[0]);
+    expect(report).toContain(
+      "- 서대문 1팀 3구역 가람\n- 서대문 2팀 1구역 나래",
+    );
+    expect(report).not.toContain("가람, 서대문");
+  });
 });
