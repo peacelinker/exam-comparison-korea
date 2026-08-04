@@ -268,4 +268,38 @@ describe("집계와 사람 매칭", () => {
       "강북",
     ]);
   });
+
+  it("21. 지역과 전체의 직전 시험 대비 전체·정규시험 증감을 계산할 수 있다", () => {
+    const result = analyzeComparison(
+      [
+        sheet("0719", [
+          row("서대문", "가람", "정규응시"),
+          row("서대문", "나래", "정규응시(타지파)"),
+          row("서대문", "다온", "일대일응시"),
+        ]),
+        sheet("0705", [
+          row("서대문", "가람", "정규응시"),
+          row("서대문", "나래", "미응시"),
+          row("서대문", "다온", "일대일응시"),
+        ]),
+      ],
+      "0719",
+      "0705",
+      "2026-07-23",
+    );
+
+    const region = result.regions[0];
+    expect(
+      region.currentCounts.attendedTotal - region.previousCounts.attendedTotal,
+    ).toBe(1);
+    expect(
+      region.currentCounts.regularGroup - region.previousCounts.regularGroup,
+    ).toBe(1);
+    expect(
+      result.currentTotals.attendedTotal - result.previousTotals.attendedTotal,
+    ).toBe(1);
+    expect(
+      result.currentTotals.regularGroup - result.previousTotals.regularGroup,
+    ).toBe(1);
+  });
 });

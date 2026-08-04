@@ -29,8 +29,16 @@ function MetricGrid({
   metrics: SnapshotMetric[];
   compact?: boolean;
 }) {
+  const classNames = [
+    "snapshot-metrics",
+    compact ? "compact" : "",
+    `metric-count-${metrics.length}`,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className={compact ? "snapshot-metrics compact" : "snapshot-metrics"}>
+    <div className={classNames}>
       {metrics.map((metric) => (
         <div key={`${metric.label}-${metric.value}`}>
           <span>{metric.label}</span>

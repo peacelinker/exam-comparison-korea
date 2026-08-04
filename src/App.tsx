@@ -495,10 +495,17 @@ function App() {
                     value: `${region.previousCounts.attendedTotal.toLocaleString()}명`,
                   },
                   {
-                    label: "증감",
+                    label: "전체시험 증감",
                     value: formatDelta(
                       region.currentCounts.attendedTotal -
                         region.previousCounts.attendedTotal,
+                    ),
+                  },
+                  {
+                    label: "정규시험 증감",
+                    value: formatDelta(
+                      region.currentCounts.regularGroup -
+                        region.previousCounts.regularGroup,
                     ),
                   },
                 ],
@@ -517,6 +524,20 @@ function App() {
                   label: "직전 시험",
                   value: `${analysis.previousTotals.attendedTotal.toLocaleString()}명`,
                 },
+                {
+                  label: "전체시험 증감",
+                  value: formatDelta(
+                    analysis.currentTotals.attendedTotal -
+                      analysis.previousTotals.attendedTotal,
+                  ),
+                },
+                {
+                  label: "정규시험 증감",
+                  value: formatDelta(
+                    analysis.currentTotals.regularGroup -
+                      analysis.previousTotals.regularGroup,
+                  ),
+                },
               ]}
               keyStats={[
                 {
@@ -528,10 +549,17 @@ function App() {
                   value: `${analysis.currentTotals.regularGroup.toLocaleString()}명`,
                 },
                 {
-                  label: "직전 시험 대비",
+                  label: "전체시험 증감",
                   value: formatDelta(
                     analysis.currentTotals.attendedTotal -
                       analysis.previousTotals.attendedTotal,
+                  ),
+                },
+                {
+                  label: "정규시험 증감",
+                  value: formatDelta(
+                    analysis.currentTotals.regularGroup -
+                      analysis.previousTotals.regularGroup,
                   ),
                 },
               ]}

@@ -567,6 +567,14 @@ label small {
   border-top: 1px solid #e7e9ee;
 }
 
+.snapshot-card .snapshot-metrics.metric-count-4 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.snapshot-total-card .snapshot-metrics.metric-count-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
 .snapshot-metrics > div {
   min-width: 0;
   display: grid;
@@ -1042,6 +1050,10 @@ input[type="number"]:focus {
 
   .snapshot-metrics {
     gap: 8px;
+  }
+
+  .snapshot-total-card .snapshot-metrics.metric-count-5 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .snapshot-metrics strong {
